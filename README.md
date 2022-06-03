@@ -39,7 +39,7 @@ With BlueJeans Android Client SDK, participants can join video conference meetin
 - Active Speaker
 - Remote and Local mute information
 
-## Current Version : 1.3.2
+## Current Version : 1.4.0
 
 ## Pre-requisites :
 - **Android API level :** Min level 26
@@ -99,7 +99,7 @@ repositories { maven { url "https://swdl.bluejeans.com/bjnvideosdk/android" } }
 
 In app's build.gradle
 ```xml
-implementation "com.bluejeans:android-client-sdk:1.3.2"
+implementation "com.bluejeans:android-client-sdk:1.4.0"
 ```
 
 ### Upgrade Instructions :
@@ -579,7 +579,7 @@ BlueJeans collects data from app clients who integrate with SDK to join BlueJean
 The BlueJeans Android Client SDK is closed source and proprietary. As a result, we cannot accept pull requests. However, we enthusiastically welcome feedback on how to make our SDK better. If you think you have found a bug, or have an improvement or feature request, please file a GitHub issue and we will get back to you. Thanks in advance for your help!
 
 ## License : 
-Copyright © 2021 BlueJeans Network. All usage of the SDK is subject to the Developer Agreement that can be found [here](LICENSE). Download the agreement and send an email to api-sdk@bluejeans.com with a signed version of this agreement, before any commercial or public facing usage of this SDK.
+Copyright © 2022 BlueJeans Network. All usage of the SDK is subject to the Developer Agreement that can be found [here](LICENSE). Download the agreement and send an email to api-sdk@bluejeans.com with a signed version of this agreement, before any commercial or public facing usage of this SDK.
 
 ## 3<sup>rd</sup> party licenses :
 Android Client SDK uses several open-source libraries. The document listing all the third-party libraries can be found [here](LICENSE-3RD-PARTY.txt).
