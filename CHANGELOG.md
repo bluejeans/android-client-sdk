@@ -124,3 +124,8 @@ Features / Changes:
 - Migration from JCenter to Maven Central for internal 3rd party dependencies
 - Misc bug fixes
 
+Version 1.4.0 *(06-2022)*
+---------------------------------
+Features / Changes:
+- Target Android SDK level 30
+- Misc bug fixes
