@@ -39,7 +39,7 @@ With BlueJeans Android Client SDK, participants can join video conference meetin
 - Active Speaker
 - Remote and Local mute information
 
-## Current Version : 1.4.0
+## Current Version : 1.4.1
 
 ## Pre-requisites :
 - **Android API level :** Min level 26
@@ -99,7 +99,7 @@ repositories { maven { url "https://swdl.bluejeans.com/bjnvideosdk/android" } }
 
 In app's build.gradle
 ```xml
-implementation "com.bluejeans:android-client-sdk:1.4.0"
+implementation "com.bluejeans:android-client-sdk:1.4.1"
 ```
 
 ### Upgrade Instructions :
