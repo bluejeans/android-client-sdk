@@ -129,3 +129,9 @@ Version 1.4.0 *(06-2022)*
 Features / Changes:
 - Target Android SDK level 30
 - Misc bug fixes
+
+
+Version 1.4.1 *(06-2022)*
+---------------------------------
+Features / Changes:
+- Misc bug fixes
