@@ -7,11 +7,11 @@ The BlueJeans Android Client Software Development Kit (SDK) gives a quick and ea
 With BlueJeans Android Client SDK, participants can join video conference meetings where they receive individual video streams from each of the video participants in the meeting. This provides an enhanced remote video quality experience with the resolution, fps of individual streams better as compared to a single composited stream in an earlier hybrid model.
 
 ## Features :
-- Audio and Video Permission handling
+- Audio, Video and Bluetooth Permission handling
 - Join, End Meeting
 - Self Video
 - Remote Audio, Remote Video states
-- Content receive 
+- Content receive
 - Audio and Video self mute
 - Orientation handling
 - Video device enumeration, Selection
@@ -28,8 +28,9 @@ With BlueJeans Android Client SDK, participants can join video conference meetin
 - Public and Private meeting Chat
 - Incoming Audio, Video and Content mute
 - Meeting Information (Title, Hostname, URL) property
-- 720p video capture (Experimental API)
-- Moderator Controls 
+- 720p video capture
+- 720p video receive
+- Moderator Controls
   - Meeting recording
   - Mute/UnMute Audio/Video of other participants / all participants
   - Remove a participant from the meeting
@@ -39,22 +40,22 @@ With BlueJeans Android Client SDK, participants can join video conference meetin
 - Active Speaker
 - Remote and Local mute information
 
-## Current Version : 1.4.1
+## Current Version : 1.5.0
 
 ## Pre-requisites :
 - **Android API level :** Min level 26
 
 - **Android Device :**
-   - OS level - Oreo 8.0 or later
-   - CPU - armeabi-v7a, arm64-v8a
-   - No support for emulator yet
+  - OS level - Oreo 8.0 or later
+  - CPU - armeabi-v7a, arm64-v8a
+  - No support for emulator yet
 
 - **Android Project & Gradle Settings:**
-   - Android X
-   - Compile SDK Version: 28 and above
-   - Source and Target compatibility to java version 1_8 in gradle
-   - RxJava, RxKotlin
-   
+  - Android X
+  - Compile SDK Version: 32 and above
+  - Source and Target compatibility to java version 1_8 in gradle
+  - RxJava, RxKotlin
+
 
 ## API Architecture
 ![Android SDK API Structure](https://user-images.githubusercontent.com/92993169/139242965-fb748808-e191-4308-be4d-4dc682f53c56.png)
@@ -68,11 +69,11 @@ You can experience BlueJeans meetings using the android client SDK by following 
 
 ### Generate a meeting ID :
 As a prerequisite to using the BlueJeans Android Client SDK to join meetings, you need to have a BlueJeans meeting ID. If you do not have a meeting ID then you can create one using a meeting schedule option using a BlueJeans account as below
-   - Sign up for a BlueJeans Account either by opting in for a [trial](https://www.bluejeans.com/free-video-conferencing-trial) or a [paid mode](https://store.bluejeans.com/)
-   - Once the account is created, you can schedule a meeting either by using the account or through the [direct API](https://bluejeans.github.io/api-rest-howto/schedule.html) calls. In order to enable API calls on your account, please reach out to [support team](https://support.bluejeans.com/s/contactsupport).
+- Sign up for a BlueJeans Account either by opting in for a [trial](https://www.bluejeans.com/free-video-conferencing-trial) or a [paid mode](https://store.bluejeans.com/)
+- Once the account is created, you can schedule a meeting either by using the account or through the [direct API](https://bluejeans.github.io/api-rest-howto/schedule.html) calls. In order to enable API calls on your account, please reach out to [support team](https://support.bluejeans.com/s/contactsupport).
 
 ### Integrate BlueJeans Android Client SDK
-Integrate the SDK using the below guidelines and use SDK APIs to join a meeting using the generated meeting ID. 
+Integrate the SDK using the below guidelines and use SDK APIs to join a meeting using the generated meeting ID.
 
 ## Integration Steps :
 ### Override Minimum SDK Version :
@@ -83,7 +84,7 @@ If your app runs with min SDK version below API level 26, you must override min 
 **Sample Code:** Add the below to your AndroidManifest.xml
 ```xml
 <uses-sdk android:minSdkVersion="26"
-tools:overrideLibrary="com.bluejeans.bluejeanssdk"/>
+        tools:overrideLibrary="com.bluejeans.bluejeanssdk"/>
 ```
 
 ### Install BlueJeans Android Client SDK:
@@ -117,9 +118,9 @@ blueJeansSDK = new BlueJeansSDK(new BlueJeansSDKInitParams(this));
 ```
 
 APIs are grouped into relevant services as in the architecture diagram. All the service objects are available all the time after SDK instantiation, however all are not active all the time.
-When inactive, APIs of the services do not react and the subscriptions will yield null. 
+When inactive, APIs of the services do not react and the subscriptions will yield null.
 
-**List of services :** 
+**List of services :**
 
 **_Globally active services_** -> MeetingService, VideoDeviceService, LoggingService and PermissionService.
 
@@ -205,7 +206,7 @@ BlueJeans SDK provides for the capability to turn ON/OFF the torch. *setTorchMod
 
 ##### Enabling 720p Video Capture :
 
-BlueJeans SDK provides for an experimental feature of 720p video capture. 
+BlueJeans SDK provides for an experimental feature of 720p video capture.
 
 ###### Pre requisites to enable 720p.
 - number of CPU cores on the device must be 8 or above.
@@ -255,27 +256,27 @@ The BlueJeans SDK's RemoteVideoFragment provides for both the audio and video pa
 
 Note: MultiStream mode is not supported on devices with a number of CPU cores less than six. In such cases, RemoteVideoFragment would receive a single composited stream (participant's videos are stitched at the server, organized based on the layout chosen and a single stream is served to the client).
 
-#### Participant background colour : 
+#### Participant background colour :
 
 By default, the participant tile when video is turned off shows a colour gradient with colour as blue at 90 degrees. This gradient colour and the gradient angle can be changed by the consumer app.
 
 Below are the steps to achieve the same:
 
-- Create a file with the name bjn_background_participant_tile.xml 
+- Create a file with the name bjn_background_participant_tile.xml
 - Add a shape with the colour and gradient angle as per your choice into the file. Find the sample for the shape as below
 ```java
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
+        android:shape="rectangle">
+<gradient
         android:angle="90"
-        android:endColor="#073571"
-        android:startColor="#6589a4" />
+                android:endColor="#073571"
+                android:startColor="#6589a4" />
 </shape>
 ```
-- Save and copy the file to the application resource drawable folder 
+- Save and copy the file to the application resource drawable folder
 - Build, Run the project
-  
+
 ### Video Resolutions and BW consumption:
 
 - Video receive resolution and BW max:
@@ -302,12 +303,12 @@ The BluejeansSDK provides APIs to mute/unmute self video.
 
 `enableSelfVideoPreview` of VideoDeviceService controls video device enablement. This drives the self video preview.
 `setVideoMuted` of MeetingService will mute/unmute the self video stream flowing to the other endpoint. This API additionally triggers self video preview states internally.
- Available when meeting state moves to MeetingState.Connected
+Available when meeting state moves to MeetingState.Connected
 
 Note that
 - video mute state applied on `enableSelfVideoPreview` needs to be applied to `setVideoMuted` once meeting state changes to MeetingState.Connected.
 - when in a meeting (meeting state is MeetingState.Connected) and if `setVideoMuted` is called with true, `enableSelfVideoPreview` is called with true,
-then the self video preview gets activated but the stream does not flow to the other endpoint.
+  then the self video preview gets activated but the stream does not flow to the other endpoint.
 
 #### Mute/Unmute Incoming Video :
 The BluejeansSDK MeetingService provides API to mute, unmute remote participants video. This is helpful in the scenarios where the user does not intend to view remote video.
@@ -315,7 +316,7 @@ Some example use cases can be
 - App has a view pager with the first page showing remote video and the second page showing content. When a user is on the content page, this API can be used to mute remote video.
 - To provide an audio only mode
 - App going in the background
-**Note:** This API does not give instant result, this may take up to 5 sec in case of back-to-back requests.
+  **Note:** This API does not give instant result, this may take up to 5 sec in case of back-to-back requests.
 
 ##### API:
 `meetingService.setRemoteVideoMuted(muted: Boolean)`
@@ -335,7 +336,7 @@ Some example use cases can be
 - App has a view pager with the first page showing remote video and the second page showing content. When user a is on the video page, this API can be used to mute content.
 - To provide an audio only mode
 - App receiving content and goes in to the background
-**Note:** This API does not give instant results, this may take up to 5sec in case of back-to-back requests. Unlike for video, we have a single API to mute content share and mute content receive. Ensure to call this only when you are not sharing the content from your end.
+  **Note:** This API does not give instant results, this may take up to 5sec in case of back-to-back requests. Unlike for video, we have a single API to mute content share and mute content receive. Ensure to call this only when you are not sharing the content from your end.
 
 ##### API :
 `meetingService.setContentMuted(muted: Boolean)`
@@ -496,9 +497,9 @@ As a moderator, one can perform
 - mute, unmute participant's / all participants video
 - remove a participant from the meeting
 - end the meeting for all immediately / after a certain delay
-- spotlight a video participant : This is also referred to as "moderator pinning". Whenever a spotlight for a participant "X" is turned on by a moderator, people layout would be pushed to all the participants and the video of "X" will take the main stage irrespective of whoever is the dominant speaker. This can be used to spotlight self or any other video participant in the meeting. Spotlight is applicable only for video participants and not for audio only participants. 
+- spotlight a video participant : This is also referred to as "moderator pinning". Whenever a spotlight for a participant "X" is turned on by a moderator, people layout would be pushed to all the participants and the video of "X" will take the main stage irrespective of whoever is the dominant speaker. This can be used to spotlight self or any other video participant in the meeting. Spotlight is applicable only for video participants and not for audio only participants.
 
-Note that 
+Note that
 - ModeratorControlsService cannot override the local audio, video mute operations performed by the participants.
 - Participants can locally override the mute enforcements by the ModeratorControlsService
 
@@ -553,12 +554,12 @@ upload them once captured.
 
 ## Subscriptions (ObservableValue and Rx Single's) :
 
-#### RxSingle : 
+#### RxSingle :
 This is a standard [Rx Single](http://reactivex.io/RxJava/javadoc/io/reactivex/Single.html)
 
 #### ObservableValue :
 
-Most of our subscriptions are stateful members called ObservableValues. 
+Most of our subscriptions are stateful members called ObservableValues.
 These are our BJN custom reactive stream elements carrying a value that can be accessed (READ only) at any point of time and also allows a subscription. Through ObservableValue you can also access [RxObservable](http://reactivex.io/RxJava/javadoc/io/reactivex/Observable.html) and subscribe.
 
 Sample app depicts the usage of both the RxSingle and ObeservableValue
@@ -578,7 +579,7 @@ BlueJeans collects data from app clients who integrate with SDK to join BlueJean
 ## Contributing :
 The BlueJeans Android Client SDK is closed source and proprietary. As a result, we cannot accept pull requests. However, we enthusiastically welcome feedback on how to make our SDK better. If you think you have found a bug, or have an improvement or feature request, please file a GitHub issue and we will get back to you. Thanks in advance for your help!
 
-## License : 
+## License :
 Copyright © 2022 BlueJeans Network. All usage of the SDK is subject to the Developer Agreement that can be found [here](LICENSE). Download the agreement and send an email to api-sdk@bluejeans.com with a signed version of this agreement, before any commercial or public facing usage of this SDK.
 
 ## 3<sup>rd</sup> party licenses :
