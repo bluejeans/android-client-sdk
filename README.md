@@ -59,7 +59,7 @@ With BlueJeans Android Client SDK, participants can join video conference meetin
   - RxJava, RxKotlin
 
 ## Developer Portal :
-Detailed documentation of SDK at our [developer portal](https://docs.bluejeans.com/)
+Detailed documentation of SDK at our [developer portal](https://docs.bluejeans.com/Android_SDK/Overview.htm)
 
 ## SDK API Documentation :
 Detailed documentation of SDK functions is available [here](https://bluejeans.github.io/android-client-sdk)
@@ -73,7 +73,7 @@ As a prerequisite to using the BlueJeans Android Client SDK to join meetings, yo
 - Once the account is created, you can schedule a meeting either by using the account or through the [direct API](https://bluejeans.github.io/api-rest-howto/schedule.html) calls. In order to enable API calls on your account, please reach out to [support team](https://support.bluejeans.com/s/contactsupport).
 
 ### Integrate BlueJeans Android Client SDK
-Integrate the SDK using the below guidelines at our [developer portal](https://docs.bluejeans.com/) and use SDK APIs to join a meeting using the generated meeting ID.
+Integrate the SDK using the below guidelines at our [developer portal](https://docs.bluejeans.com/Android_SDK/Overview.htm) and use SDK APIs to join a meeting using the generated meeting ID.
 
 ## SDK Sample Application :
 We have bundled two sample apps in this repo. One for Java and another for kotlin.
