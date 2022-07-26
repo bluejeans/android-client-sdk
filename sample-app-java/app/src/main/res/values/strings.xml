@@ -32,6 +32,8 @@
     <string name="type_message">Type a message</string>
     <string name="chat">Chat</string>
     <string name="togglecc">CC</string>
+    <string name="hd_capture">720 Capture</string>
+    <string name="hd_receive">720 Receive</string>
 
     <string name="waiting_room">Waiting Room</string>
     <string name="waiting_room_message">You are in waiting room. Waiting for the moderator to approve/deny your join request.</string>
