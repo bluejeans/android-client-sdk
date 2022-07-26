@@ -28,8 +28,6 @@ With BlueJeans Android Client SDK, participants can join video conference meetin
 - Public and Private meeting Chat
 - Incoming Audio, Video and Content mute
 - Meeting Information (Title, Hostname, URL) property
-- 720p video capture
-- 720p video receive
 - Moderator Controls
   - Meeting recording
   - Mute/UnMute Audio/Video of other participants / all participants
@@ -39,6 +37,10 @@ With BlueJeans Android Client SDK, participants can join video conference meetin
 - Waiting room
 - Active Speaker
 - Remote and Local mute information
+
+## New Features :
+- 720p video capture
+- 720p video receive
 
 ## Current Version : 1.5.0
 
