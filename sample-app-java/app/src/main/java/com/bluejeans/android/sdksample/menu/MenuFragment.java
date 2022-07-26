@@ -15,10 +15,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import com.bluejeans.android.sdksample.R;
 import com.bluejeans.android.sdksample.SampleApplication;
+import com.bluejeans.rxextensions.ObservableValue;
 import com.bluejeans.rxextensions.ObservableValueWithOptional;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
+
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 
@@ -32,8 +34,10 @@ public class MenuFragment extends BottomSheetDialogFragment {
     private String mVideoLayout = "";
     private String mCurrentAudioDevice = "";
     private String mCurrentVideoDevice = "";
-    private boolean mClosedCaptionState =  false;
-    private SwitchCompat mSwitchClosedCaption, mSwitchWaitingRoom;
+    private boolean mClosedCaptionState = false;
+    private boolean mHDCaptureState = false;
+    private boolean mHDReceiveState = false;
+    private SwitchCompat mSwitchClosedCaption, mSwitchWaitingRoom, mSwitchHDCapture, mSwitch720Receive;
     private LinearLayout mWaitingRoomLayout;
 
     private Disposable mWaitingRoomEnablementDisposable;
@@ -46,6 +50,10 @@ public class MenuFragment extends BottomSheetDialogFragment {
         void showVideoDeviceView();
 
         void handleClosedCaptionSwitchEvent(Boolean enabled);
+
+        void handleHDCaptureSwitchEvent(Boolean isChecked);
+
+        void handleHDReceiveSwitchEvent(Boolean isChecked);
 
         void showWaitingRoom();
 
@@ -107,11 +115,18 @@ public class MenuFragment extends BottomSheetDialogFragment {
         mClosedCaptionState = isClosedCaptionActive;
     }
 
+    public void updateHDCaptureState(boolean captureHD) {
+        mHDCaptureState = captureHD;
+        mSwitchHDCapture.setChecked(mHDCaptureState);
+    }
+
     private void initViews(View view) {
         mMbVideoLayout = view.findViewById(R.id.mbVideoLayout);
         mMbAudioDevice = view.findViewById(R.id.mbAudioDevice);
         mMbVideoDevice = view.findViewById(R.id.mbVideoDevice);
         mSwitchClosedCaption = view.findViewById(R.id.swClosedCaption);
+        mSwitchHDCapture = view.findViewById(R.id.swHDCapture);
+        mSwitch720Receive = view.findViewById(R.id.swHDReceive);
 
         if (SampleApplication.getBlueJeansSDK().getBlueJeansClient().getMeetingSession().isModerator()) {
             mWaitingRoomLayout = view.findViewById(R.id.llWaitingRoom);
@@ -183,6 +198,21 @@ public class MenuFragment extends BottomSheetDialogFragment {
             mSwitchClosedCaption.setVisibility(View.GONE);
         }
 
+        mHDCaptureState = SampleApplication.getBlueJeansSDK().getVideoDeviceService().is720pVideoCaptureEnabled().getValue();
+        mSwitchHDCapture.setChecked(mHDCaptureState);
+        mSwitchHDCapture.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (buttonView.isPressed()) {
+                mIMenuCallback.handleHDCaptureSwitchEvent(isChecked);
+            }
+        });
+
+        mHDReceiveState = SampleApplication.getBlueJeansSDK().getVideoDeviceService().is720pVideoReceiveEnabled().getValue();
+        mSwitch720Receive.setChecked(mHDReceiveState);
+        mSwitch720Receive.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+            if (buttonView.isPressed()) {
+                mIMenuCallback.handleHDReceiveSwitchEvent(isChecked);
+            }
+        }));
         updateView();
     }
 
@@ -202,5 +232,6 @@ public class MenuFragment extends BottomSheetDialogFragment {
     public void onResume() {
         super.onResume();
         mSwitchClosedCaption.setChecked(mClosedCaptionState);
+        mSwitchHDCapture.setChecked(mHDCaptureState);
     }
 }

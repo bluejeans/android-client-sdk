@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.bjnclientcore.media.sequin.Sequin
 import com.bjnclientcore.ui.util.extensions.gone
 import com.bjnclientcore.ui.util.extensions.visible
 import com.bluejeans.android.sdksample.SampleApplication
@@ -27,7 +28,8 @@ class MenuFragment(
     private var videoLayout = ""
     private var currentAudioDevice = ""
     private var currentVideoDevice = ""
-    private var closedCaptionState =  false
+    private var closedCaptionState = false
+    private var hdCaptureState = false
     private var menuFragmentBinding: FragmentOptionMenuDialogBinding? = null
     private var bottomSheetBehavior: BottomSheetBehavior<View>? = null
 
@@ -38,6 +40,8 @@ class MenuFragment(
         fun showAudioDeviceView()
         fun showVideoDeviceView()
         fun handleClosedCaptionSwitchEvent(isChecked: Boolean)
+        fun handleHDCaptureSwitchEvent(isChecked: Boolean)
+        fun handleHDReceiveSwitchEvent(isChecked: Boolean)
         fun showWaitingRoom()
         fun setWaitingRoomEnabled(enabled: Boolean)
     }
@@ -105,6 +109,11 @@ class MenuFragment(
         closedCaptionState = isClosedCaptionActive
     }
 
+    fun updateHDCaptureState(captureHD: Boolean) {
+        hdCaptureState = captureHD
+        menuFragmentBinding?.swHDCapture?.isChecked = hdCaptureState
+    }
+
     private fun initViews() {
         menuFragmentBinding?.mbVideoLayout?.setOnClickListener {
             menuCallBack.showVideoLayoutView(menuFragmentBinding!!.mbVideoLayout.text as String)
@@ -134,6 +143,20 @@ class MenuFragment(
             menuFragmentBinding?.swClosedCaption?.visible()
         } else {
             menuFragmentBinding?.swClosedCaption?.gone()
+        }
+
+
+        hdCaptureState = SampleApplication.blueJeansSDK.videoDeviceService.is720pVideoCaptureEnabled.value
+        menuFragmentBinding?.swHDCapture?.isChecked = hdCaptureState
+        menuFragmentBinding?.swHDCapture?.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (buttonView.isPressed) {
+                menuCallBack.handleHDCaptureSwitchEvent(isChecked)
+            }
+        }
+
+        menuFragmentBinding?.swHDReceive?.isChecked = SampleApplication.blueJeansSDK.videoDeviceService.is720pVideoReceiveEnabled.value == true
+        menuFragmentBinding?.swHDReceive?.setOnCheckedChangeListener { buttonView, isChecked ->
+            menuCallBack.handleHDReceiveSwitchEvent(isChecked)
         }
 
         if (SampleApplication.blueJeansSDK.meetingService.moderatorControlsService.isModeratorControlsAvailable.value == true) {
@@ -168,5 +191,6 @@ class MenuFragment(
     override fun onResume() {
         super.onResume()
         menuFragmentBinding?.swClosedCaption?.isChecked = closedCaptionState
+        menuFragmentBinding?.swHDCapture?.isChecked = hdCaptureState
     }
 }

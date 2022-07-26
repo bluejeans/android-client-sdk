@@ -3,26 +3,6 @@
  */
 package com.bluejeans.android.sdksample;
 
-import com.bjnclientcore.inmeeting.contentshare.ContentShareType;
-import com.bluejeans.android.sdksample.dialog.WaitingRoomDialog;
-import com.bluejeans.android.sdksample.menu.MenuFragment;
-import com.bluejeans.android.sdksample.menu.MenuFragment.IMenuCallback;
-import com.bluejeans.android.sdksample.menu.adapters.AudioDeviceAdapter;
-import com.bluejeans.android.sdksample.menu.adapters.VideoDeviceAdapter;
-import com.bluejeans.android.sdksample.menu.adapters.VideoLayoutAdapter;
-import com.bluejeans.android.sdksample.participantlist.ParticipantListFragment;
-import com.bluejeans.bluejeanssdk.devices.AudioDevice;
-import com.bluejeans.bluejeanssdk.devices.VideoDevice;
-import com.bluejeans.bluejeanssdk.devices.VideoDeviceService;
-import com.bluejeans.bluejeanssdk.logging.LoggingService;
-import com.bluejeans.bluejeanssdk.meeting.ClosedCaptioningService;
-import com.bluejeans.bluejeanssdk.meeting.ContentShareAvailability;
-import com.bluejeans.bluejeanssdk.meeting.ContentShareState;
-import com.bluejeans.bluejeanssdk.meeting.MeetingService;
-import com.bluejeans.bluejeanssdk.meeting.ParticipantsService;
-import com.bluejeans.bluejeanssdk.meeting.WaitingRoomParticipantEvent;
-import com.bluejeans.bluejeanssdk.permission.PermissionService;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -49,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -57,16 +38,37 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
+
+import com.bjnclientcore.inmeeting.contentshare.ContentShareType;
+import com.bluejeans.android.sdksample.dialog.WaitingRoomDialog;
+import com.bluejeans.android.sdksample.menu.MenuFragment;
+import com.bluejeans.android.sdksample.menu.MenuFragment.IMenuCallback;
+import com.bluejeans.android.sdksample.menu.adapters.AudioDeviceAdapter;
+import com.bluejeans.android.sdksample.menu.adapters.VideoDeviceAdapter;
+import com.bluejeans.android.sdksample.menu.adapters.VideoLayoutAdapter;
+import com.bluejeans.android.sdksample.participantlist.ParticipantListFragment;
+import com.bluejeans.bluejeanssdk.devices.AudioDevice;
+import com.bluejeans.bluejeanssdk.devices.VideoDevice;
+import com.bluejeans.bluejeanssdk.devices.VideoDeviceService;
+import com.bluejeans.bluejeanssdk.logging.LoggingService;
+import com.bluejeans.bluejeanssdk.meeting.ClosedCaptioningService;
+import com.bluejeans.bluejeanssdk.meeting.ContentShareAvailability;
+import com.bluejeans.bluejeanssdk.meeting.ContentShareState;
+import com.bluejeans.bluejeanssdk.meeting.MeetingService;
+import com.bluejeans.bluejeanssdk.meeting.ParticipantsService;
+import com.bluejeans.bluejeanssdk.meeting.WaitingRoomParticipantEvent;
+import com.bluejeans.bluejeanssdk.permission.PermissionService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import kotlin.Unit;
-
 
 import static com.bluejeans.android.sdksample.utils.AudioDeviceHelper.getAudioDeviceName;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = "MainActivity";
@@ -136,12 +138,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        mMeetingService.setVideoMuted(true);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        mMeetingService.setVideoMuted(mIsVideoMuted);
         if (!mIsScreenShareInProgress) {
             MeetingService.MeetingState meetingState = mMeetingService.getMeetingState().getValue();
             handleMeetingState(meetingState);
         }
+        mMeetingService.requestAudioFocus();
     }
 
     @Override
@@ -159,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.btnJoin:
                 if (mMeetingService.getMeetingState().getValue() instanceof MeetingService.MeetingState.Idle) {
-                    checkMinimumPermissionsAndJoin();
+                    checkAllPermissionsAndJoin();
                 } else {
                     showToastMessage(getString(R.string.meeting_in_progress));
                 }
@@ -318,12 +328,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         subscribeForContentShareEvents();
         subscribeForClosedCaptionText();
         subscribeForClosedCaptionState();
+        subscribeForHDCaptureState();
         subscribeToActiveSpeaker();
         subscribeForModeratorWaitingRoomEvents();
 
         mIsCallInProgress = true;
     }
-    
+
     private void checkCameraPermissionAndStartSelfVideo() {
         if (mPermissionService.hasPermission(PermissionService.Permission.Camera.INSTANCE)) {
             startSelfVideo();
@@ -349,16 +360,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mVideoDeviceService.enableSelfVideoPreview(true);
     }
 
-    private void checkMinimumPermissionsAndJoin() {
-        if (mPermissionService.hasMinimumPermissions()) {
+    private void checkAllPermissionsAndJoin() {
+        if (mPermissionService.hasAllPermissions()) {
             hideKeyboard();
             joinMeeting();
         } else {
-            requestMinimumPermissionsAndJoin();
+            requestAllPermissionsAndJoin();
         }
     }
 
-    private void requestMinimumPermissionsAndJoin() {
+    private void requestAllPermissionsAndJoin() {
         mDisposable.add(mPermissionService.requestAllPermissions().subscribe(
                 areAllPermissionsGranted -> {
                     if (areAllPermissionsGranted == PermissionService.RequestStatus.Granted.INSTANCE) {
@@ -414,12 +425,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void subscribeForMeetingStatus() {
         mDisposable.add(
                 mMeetingService.getMeetingState().getRxObservable().observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(state -> {
-                        Log.i(TAG, "State: " + state);
-                        handleMeetingState(state);
-                    }, err -> {
-                        Log.e(TAG, err.getMessage());
-                    })
+                        .subscribe(state -> {
+                            Log.i(TAG, "State: " + state);
+                            handleMeetingState(state);
+                        }, err -> {
+                            Log.e(TAG, err.getMessage());
+                        })
         );
     }
 
@@ -665,6 +676,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ));
     }
 
+    private void subscribeForHDCaptureState() {
+        mInMeetingDisposable.add(
+                mVideoDeviceService.is720pVideoCaptureEnabled()
+                        .subscribeOnUI(
+                                hdCaptureState -> {
+                                    mBottomSheetFragment.updateHDCaptureState(hdCaptureState);
+                                    return Unit.INSTANCE;
+                                }, err -> {
+                                    Log.e(TAG, "Error subscribing hd capture state");
+                                    return Unit.INSTANCE;
+                                }
+                        ));
+    }
+
     private void subscribeToActiveSpeaker() {
         mInMeetingDisposable.add(mMeetingService.getParticipantsService().getActiveSpeaker().getRxObservable().observeOn(AndroidSchedulers.mainThread())
                 .subscribe(participant -> {
@@ -673,12 +698,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         Log.e(TAG, "Participant information is missing");
                     }
-                }, err-> {
+                }, err -> {
                     Log.e(TAG, "Exception while subscribing to active speaker: " + err.getMessage());
                 })
         );
     }
-    
+
     private void subscribeForModeratorWaitingRoomEvents() {
         boolean isModerator = SampleApplication.getBlueJeansSDK()
                 .getBlueJeansClient().getMeetingSession().isModerator();
@@ -789,7 +814,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     .replace(
                             R.id.inMeetingFragmentContainer,
                             inMeetingFragment
-                ).commit();
+                    ).commit();
         }
     }
 
@@ -878,7 +903,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mCameraSettings.setVisibility(View.VISIBLE);
         }
     }
-    
+
     private void closeCameraSettings() {
         mZoomScaleFactor = 1;
         if (mCameraSettingsDialog != null && mCameraSettingsDialog.isShowing()) {
@@ -937,6 +962,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mMeetingService.getClosedCaptioningService().stopClosedCaptioning();
                         mTvClosedCaption.setVisibility(View.GONE);
                     }
+                }
+
+                @Override
+                public void handleHDCaptureSwitchEvent(Boolean isChecked) {
+                    Log.d(TAG, "Enabling hdCapture " + isChecked);
+                    mVideoDeviceService.set720pVideoCaptureEnabled(isChecked);
+                }
+
+                @Override
+                public void handleHDReceiveSwitchEvent(Boolean isChecked) {
+                    Log.d(TAG, "Enabling hdReceive " + isChecked);
+                    mVideoDeviceService.set720pVideoReceiveEnabled(isChecked);
                 }
 
                 @Override
@@ -1124,7 +1161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mIsInWaitingRoom = false;
             showWaitingRoomUI();
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
-        } else if (meetingState instanceof  MeetingService.MeetingState.WaitingRoom) {
+        } else if (meetingState instanceof MeetingService.MeetingState.WaitingRoom) {
             removeInMeetingFragment();
             mIsInWaitingRoom = true;
             mInMeetingDisposable.clear();

@@ -1,122 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="@dimen/_12dp"
-    android:paddingBottom="@dimen/_12dp">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tvVideoLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_20dp"
-        android:text="@string/video_layout"
-        android:textColor="@color/black"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/mbVideoLayout"
-        style="@style/MaterialDropDownButton"
-        android:hint="@string/video_layout"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/tvVideoLayout"
-        app:layout_constraintTop_toBottomOf="@id/tvVideoLayout" />
-
-    <TextView
-        android:id="@+id/tvAudioDevice"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_8dp"
-        android:text="@string/audio_device"
-        android:textColor="@color/black"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@id/mbVideoLayout"
-        app:layout_constraintTop_toBottomOf="@id/mbVideoLayout" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/mbAudioDevice"
-        style="@style/MaterialDropDownButton"
-        android:hint="@string/audio_device"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/tvAudioDevice"
-        app:layout_constraintTop_toBottomOf="@id/tvAudioDevice" />
-
-    <TextView
-        android:id="@+id/tvVideodevice"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_8dp"
-        android:text="@string/video_device"
-        android:textColor="@color/black"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@id/mbAudioDevice"
-        app:layout_constraintTop_toBottomOf="@id/mbAudioDevice" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/mbVideoDevice"
-        style="@style/MaterialDropDownButton"
-        android:hint="@string/video_device"
-        app:layout_constraintBottom_toTopOf="@id/horizontalLine"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/tvVideodevice"
-        app:layout_constraintTop_toBottomOf="@id/tvVideodevice"
-        app:layout_constraintVertical_bias="0.1" />
-
-    <View
-        android:id="@+id/horizontalLine"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        style="@style/MaterialDropDownButton"
-        android:layout_height="1dp"
-        android:layout_marginTop="5dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mbVideoDevice"
-        app:layout_constraintRight_toRightOf="parent"
-        android:background="@color/black"/>
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/_12dp"
+        android:paddingBottom="@dimen/_12dp">
 
-    <androidx.appcompat.widget.SwitchCompat
-        android:layout_width="wrap_content"
-        android:id="@+id/swClosedCaption"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:text="@string/togglecc"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/horizontalLine"
-        android:layout_height="wrap_content">
-    </androidx.appcompat.widget.SwitchCompat>
+        <TextView
+            android:id="@+id/tvVideoLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_20dp"
+            android:text="@string/video_layout"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/llWaitingRoom"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        android:layout_marginStart="@dimen/_20dp"
-        android:layout_marginEnd="@dimen/_20dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/swClosedCaption">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mbVideoLayout"
+            style="@style/MaterialDropDownButton"
+            android:hint="@string/video_layout"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tvVideoLayout"
+            app:layout_constraintTop_toBottomOf="@id/tvVideoLayout" />
+
+        <TextView
+            android:id="@+id/tvAudioDevice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_8dp"
+            android:text="@string/audio_device"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/mbVideoLayout"
+            app:layout_constraintTop_toBottomOf="@id/mbVideoLayout" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mbAudioDevice"
+            style="@style/MaterialDropDownButton"
+            android:hint="@string/audio_device"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tvAudioDevice"
+            app:layout_constraintTop_toBottomOf="@id/tvAudioDevice" />
+
+        <TextView
+            android:id="@+id/tvVideodevice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_8dp"
+            android:text="@string/video_device"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/mbAudioDevice"
+            app:layout_constraintTop_toBottomOf="@id/mbAudioDevice" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mbVideoDevice"
+            style="@style/MaterialDropDownButton"
+            android:hint="@string/video_device"
+            app:layout_constraintBottom_toTopOf="@id/horizontalLine"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@id/tvVideodevice"
+            app:layout_constraintTop_toBottomOf="@id/tvVideodevice"
+            app:layout_constraintVertical_bias="0.1" />
+
+        <View
+            android:id="@+id/horizontalLine"
+            style="@style/MaterialDropDownButton"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:background="@color/black"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mbVideoDevice" />
 
         <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/swWaitingRoom"
+            android:id="@+id/swHDReceive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/waiting_room" />
+            android:text="@string/hd_receive"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/horizontalLine" />
 
-        <Button
-            android:id="@+id/btnShowWaitingRoom"
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/swHDCapture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/view_waiting_room"
-            android:layout_marginBottom="@dimen/_8dp" />
-    </LinearLayout>
+            android:text="@string/hd_capture"
+            app:layout_constraintEnd_toStartOf="@+id/swClosedCaption"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/swHDReceive" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/swClosedCaption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/togglecc"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/swHDCapture"
+            app:layout_constraintTop_toBottomOf="@id/swHDReceive" />
+
+        <LinearLayout
+            android:id="@+id/llWaitingRoom"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/_20dp"
+            android:layout_marginEnd="@dimen/_20dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/swHDCapture">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/swWaitingRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="@string/waiting_room" />
+
+            <Button
+                android:id="@+id/btnShowWaitingRoom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/_8dp"
+                android:layout_weight="0.5"
+                android:text="@string/view_waiting_room" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
