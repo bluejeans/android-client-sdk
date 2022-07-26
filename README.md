@@ -58,11 +58,6 @@ With BlueJeans Android Client SDK, participants can join video conference meetin
   - Source and Target compatibility to java version 1_8 in gradle
   - RxJava, RxKotlin
 
-
-## API Architecture
-![Android SDK API Structure](https://user-images.githubusercontent.com/92993169/139242965-fb748808-e191-4308-be4d-4dc682f53c56.png)
-
-
 ## SDK API Documentation :
 Detailed documentation of SDK functions is available [here](https://bluejeans.github.io/android-client-sdk)
 
