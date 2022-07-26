@@ -135,3 +135,10 @@ Version 1.4.1 *(06-2022)*
 ---------------------------------
 Features / Changes:
 - Misc bug fixes
+
+Version 1.5.0 *(07-2022)*
+---------------------------------
+Features / Changes:
+- 720p video send and recieve
+- Target OS level 12
+- Misc bug fixes
