@@ -30,13 +30,21 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bjnclientcore.inmeeting.contentshare.ContentShareType
+import com.bjnclientcore.media.individualstream.StreamPriority
+import com.bjnclientcore.media.individualstream.StreamQuality
+import com.bjnclientcore.media.individualstream.VideoStreamStyle
 import com.bjnclientcore.ui.util.extensions.gone
 import com.bjnclientcore.ui.util.extensions.visible
 import com.bluejeans.android.sdksample.MeetingNotificationUtility.updateNotificationMessage
 import com.bluejeans.android.sdksample.databinding.ActivityMainBinding
 import com.bluejeans.android.sdksample.dialog.WaitingRoomDialog
+import com.bluejeans.android.sdksample.isc.IscGalleryFragment
+import com.bluejeans.android.sdksample.isc.IscParticipantListAdapter
+import com.bluejeans.android.sdksample.isc.usecases.RemoteAssistFragment
+import com.bluejeans.android.sdksample.isc.usecases.RemoteLearningFragment
 import com.bluejeans.android.sdksample.menu.MenuFragment
 import com.bluejeans.android.sdksample.menu.adapter.MenuItemAdapter
+import com.bluejeans.android.sdksample.participantlist.IscParticipantListFragment
 import com.bluejeans.android.sdksample.participantlist.ParticipantListFragment
 import com.bluejeans.android.sdksample.utils.AudioDeviceHelper.Companion.getAudioDeviceName
 import com.bluejeans.bluejeanssdk.devices.AudioDevice
@@ -67,28 +75,73 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private var bottomSheetFragment: MenuFragment? = null
     private var participantListFragment: ParticipantListFragment? = null
+    private var iscParticipantListFragment: IscParticipantListFragment? = null
     private var videoDeviceAdapter: MenuItemAdapter<VideoDevice>? = null
     private var audioDeviceAdapter: MenuItemAdapter<AudioDevice>? = null
+    private var iscStreamStyleAdapter: MenuItemAdapter<String>? = null
+    private var iscUseCasesAdapter: MenuItemAdapter<String>? = null
     private var videoLayoutAdapter: MenuItemAdapter<String>? = null
     private var currentVideoLayout: MeetingService.VideoLayout = MeetingService.VideoLayout.Speaker
     private var audioDeviceDialog: AlertDialog? = null
     private var videoDeviceDialog: AlertDialog? = null
     private var videoLayoutDialog: AlertDialog? = null
+    private var iscUseCasesDialog: AlertDialog? = null
     private var cameraSettingsDialog: AlertDialog? = null
     private var uploadLogsDialog: AlertDialog? = null
     private var progressBar: ProgressBar? = null
+    private var zoomSeekBar: SeekBar? = null
 
     private lateinit var binding: ActivityMainBinding
     private var zoomScaleFactor = 1 // default value of 1, no zoom to start with
 
     private var isAudioMuted = false
     private var isVideoMuted = false
+    private var isVideoMutedBeforeBackgrounding = false
     private var isRemoteContentAvailable = false
     private var isInWaitingRoom = false
     private var isWaitingRoomEnabled = false
     private var isScreenShareInProgress = false
     private var isReconnecting = false
     private var isCallInProgress = false
+
+    private var iscGalleryFragment: IscGalleryFragment? = null
+    private var inMeetingFragment: InMeetingFragment? = null
+
+    private var currentPinnedParticipant: String? = null
+    private var remoteLearningFragment: RemoteLearningFragment? = null
+    private var remoteAssistFragment: RemoteAssistFragment? = null
+
+    private val streamConfigUpdatedCallback =
+        object : IscParticipantListAdapter.IStreamConfigUpdatedCallback {
+            override fun onStreamConfigUpdated(
+                participantGuid: String,
+                streamQuality: StreamQuality,
+                streamPriority: StreamPriority
+            ) {
+                if (supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is IscGalleryFragment) {
+                    iscGalleryFragment?.updateStreamConfigurations(
+                        participantGuid,
+                        streamQuality,
+                        streamPriority
+                    )
+                }
+            }
+
+            override fun pinParticipant(participantId: String, isPinned: Boolean) {
+                if (supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is IscGalleryFragment) {
+                    iscGalleryFragment?.let { fragment ->
+                        fragment.pinParticipant(participantId, isPinned)
+                        if (isPinned) {
+                            currentPinnedParticipant = participantId
+                            iscParticipantListFragment?.setPinnedParticipant(participantId)
+                        } else {
+                            currentPinnedParticipant = null
+                            iscParticipantListFragment?.setPinnedParticipant(null)
+                        }
+                    }
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,7 +163,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        meetingService.setVideoMuted(isVideoMuted)
+        meetingService.setVideoMuted(isVideoMutedBeforeBackgrounding)
         if (!isScreenShareInProgress) {
             handleMeetingState(meetingService.meetingState.value)
         }
@@ -137,7 +190,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
             R.id.ivClose -> {
                 meetingService.endMeeting()
-                videoDeviceService.enableSelfVideoPreview(!isVideoMuted)
                 endMeeting()
             }
             R.id.ivMic -> {
@@ -147,23 +199,33 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
             R.id.ivVideo -> {
                 isVideoMuted = !isVideoMuted
-                if (areInMeetingServicesAvailable()) {
-                    meetingService.setVideoMuted(isVideoMuted)
-                } else {
-                    videoDeviceService.enableSelfVideoPreview(!isVideoMuted)
-                }
+                meetingService.setVideoMuted(isVideoMuted)
                 toggleVideoMuteUnMuteView(isVideoMuted)
             }
             R.id.ivMenuOption -> {
-                bottomSheetFragment?.let { it.show(supportFragmentManager, it.tag) }
+                bottomSheetFragment?.let {
+                    it.isIscEnabled = binding.joinInfo.cbShowIsc.isChecked
+                    it.show(supportFragmentManager, it.tag)
+                }
             }
             R.id.ivRoster -> {
-                participantListFragment?.let {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.rosterContainer, it)
-                        .addToBackStack("ParticipantListFragment")
-                        .commit()
+                if (isVideoStreamRoster()) {
+                    iscParticipantListFragment?.let {
+                        iscParticipantListFragment?.setPinnedParticipant(currentPinnedParticipant)
+                        supportFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.rosterContainer, it)
+                            .addToBackStack("IscParticipantListFragment")
+                            .commit()
+                    }
+                } else {
+                    participantListFragment?.let {
+                        supportFragmentManager
+                            .beginTransaction()
+                            .replace(R.id.rosterContainer, it)
+                            .addToBackStack("ParticipantListFragment")
+                            .commit()
+                    }
                 }
             }
             R.id.ivScreenShare -> {
@@ -188,6 +250,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onPause() {
         super.onPause()
+        isVideoMutedBeforeBackgrounding = isVideoMuted
         meetingService.setVideoMuted(true)
     }
 
@@ -325,7 +388,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             .beginTransaction()
             .replace(R.id.selfViewFrame, videoDeviceService.selfVideoFragment)
             .commit()
-        videoDeviceService.enableSelfVideoPreview(true)
+        meetingService.setVideoMuted(false)
     }
 
     private fun checkAllPermissionsAndJoin() {
@@ -404,6 +467,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun endMeeting() {
         Timber.tag(TAG).i("endMeeting")
         isReconnecting = false
+
+        if (binding.selfView.selfView.visibility == View.GONE) {
+            binding.selfView.selfView.visibility = View.VISIBLE
+        }
+
         if (isInWaitingRoom) {
             isInWaitingRoom = false
             showWaitingRoomUI()
@@ -439,7 +507,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                         MeetingService.WaitingRoomEvent.Denied -> showToastMessage("Denied by moderator")
                         MeetingService.WaitingRoomEvent.Demoted -> {
                             showToastMessage("Demoted by moderator")
-                            videoDeviceService.enableSelfVideoPreview(!isVideoMuted)
                         }
                         else -> Timber.tag(TAG).i("Unrecognized event: $it")
                     }
@@ -454,6 +521,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             { isMuted ->
                 // This could be due to local mute or remote mute
                 Timber.tag(TAG).i(" Audio Mute state $isMuted")
+                isMuted?.let {
+                    isAudioMuted = it
+                }
                 isMuted?.let { toggleAudioMuteUnMuteView(it) }
             }
         ) {
@@ -466,6 +536,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             { isMuted ->
                 // This could be due to local mute or remote mute
                 Timber.tag(TAG).i(" Video Mute state $isMuted")
+                isMuted?.let {
+                    isVideoMuted = it
+                }
                 isMuted?.let { toggleVideoMuteUnMuteView(it) }
             }
         ) {
@@ -477,10 +550,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         inMeetingDisposable.add(meetingService.videoLayout.subscribe(
             { videoLayout ->
                 if (videoLayout != null) {
+                    if (supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is IscGalleryFragment &&
+                            videoLayout != MeetingService.VideoLayout.Custom) {
+                        replaceInMeetingFragment(false)
+                    }
                     currentVideoLayout = videoLayout
                     val videoLayoutName = getVideoLayoutDisplayName(videoLayout)
                     bottomSheetFragment?.updateVideoLayout(videoLayoutName)
                     updateCurrentVideoLayoutForAlertDialog(videoLayoutName)
+
+                    if (binding.selfView.selfView.visibility == View.GONE) {
+                        binding.selfView.selfView.visibility = View.VISIBLE
+                    }
                 }
             }
         ) {
@@ -534,6 +615,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun subscribeForParticipants() {
         inMeetingDisposable.add(meetingService.participantsService.participants.subscribeOnUI(
             {
+                iscParticipantListFragment?.updateMeetingList(it)
                 participantListFragment?.updateMeetingList(it)
             }
         ) { err ->
@@ -612,8 +694,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                             {
                                 it.value?.let { isChecked ->
                                     isWaitingRoomEnabled = isChecked
-                                    bottomSheetFragment =
-                                        MenuFragment(mIOptionMenuCallback, isWaitingRoomEnabled)
                                 }
                             }, {
                                 Timber.tag(TAG).e(it.message)
@@ -723,6 +803,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 .subscribeOnUI(
                     {
                         bottomSheetFragment?.updateHDCaptureState(it)
+                        zoomSeekBar?.setProgress(1)
                     },
                     {
                         Timber.tag(TAG)
@@ -764,22 +845,36 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding.ivScreenShare.setOnClickListener(this)
         binding.ivUploadLogs.setOnClickListener(this)
 
-        bottomSheetFragment = MenuFragment(mIOptionMenuCallback, isWaitingRoomEnabled)
+        bottomSheetFragment = MenuFragment(
+            mIOptionMenuCallback, isWaitingRoomEnabled
+        )
+        bottomSheetFragment?.updateVideoStreamStyle(resources.getStringArray(R.array.stream_styles)[0])
         participantListFragment = ParticipantListFragment()
+        iscParticipantListFragment = IscParticipantListFragment(streamConfigUpdatedCallback)
         videoLayoutAdapter = getVideoLayoutAdapter()
         videoDeviceAdapter = getVideoDeviceAdapter(ArrayList())
         audioDeviceAdapter = getAudioDeviceAdapter(ArrayList())
+        iscStreamStyleAdapter = getIscAdapter(resources.getStringArray(R.array.stream_styles))
+        iscUseCasesAdapter = getIscAdapter(resources.getStringArray(R.array.isc_use_cases))
         binding.tvAppVersion.text = appVersionString
     }
 
-    private fun showInMeetingFragment() {
+    private fun showInMeetingFragment(showIscFragment: Boolean) {
         if (supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) == null) {
-            val inMeetingFragment = InMeetingFragment()
+            Timber.tag(TAG)
+                .i("${supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer)}")
+            iscGalleryFragment = IscGalleryFragment()
+            inMeetingFragment = InMeetingFragment()
+            val inMeetingFragment =
+                if (showIscFragment) iscGalleryFragment!! else inMeetingFragment!!
             supportFragmentManager.beginTransaction()
                 .replace(
                     R.id.inMeetingFragmentContainer,
                     inMeetingFragment
                 ).commit()
+        } else {
+            Timber.tag(TAG)
+                .i("${supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer)}")
         }
     }
 
@@ -791,6 +886,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 .remove(it)
                 .commit()
         }
+    }
+
+    private fun replaceInMeetingFragment(showIscFragment: Boolean) {
+        iscGalleryFragment?.onDestroy()
+        inMeetingFragment?.onDestroy()
+        remoteLearningFragment?.onDestroy()
+        remoteAssistFragment?.onDestroy()
+        iscGalleryFragment = IscGalleryFragment()
+        inMeetingFragment = InMeetingFragment()
+        val inMeetingFragment = if (showIscFragment) iscGalleryFragment!! else inMeetingFragment!!
+        supportFragmentManager.beginTransaction()
+            .replace(
+                R.id.inMeetingFragmentContainer,
+                inMeetingFragment
+            )
+            .commit()
     }
 
     private fun showJoiningInProgressView() {
@@ -838,9 +949,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding.tvClosedCaption.gone()
         binding.tvClosedCaption.text = null
         if (bottomSheetFragment?.isAdded == true) with(bottomSheetFragment) { this?.dismiss() }
-        if (participantListFragment?.isAdded == true) {
+        if (participantListFragment?.isAdded == true && !binding.joinInfo.cbShowIsc.isChecked) {
             supportFragmentManager.beginTransaction().remove(participantListFragment!!).commit()
             val fragment = supportFragmentManager.findFragmentByTag("ParticipantListFragment")
+            if (fragment != null) {
+                supportFragmentManager.beginTransaction().remove(fragment).commit()
+            }
+        }
+        if (participantListFragment?.isAdded == true && binding.joinInfo.cbShowIsc.isChecked) {
+            supportFragmentManager.beginTransaction().remove(iscParticipantListFragment!!).commit()
+            val fragment = supportFragmentManager.findFragmentByTag("IscParticipantListFragment")
             if (fragment != null) {
                 supportFragmentManager.beginTransaction().remove(fragment).commit()
             }
@@ -849,6 +967,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         if (audioDeviceDialog?.isShowing == true) audioDeviceDialog?.dismiss()
         if (videoDeviceDialog?.isShowing == true) videoDeviceDialog?.dismiss()
         if (videoLayoutDialog?.isShowing == true) videoLayoutDialog?.dismiss()
+        if (iscUseCasesDialog?.isShowing == true) iscUseCasesDialog?.dismiss()
     }
 
     private fun hideProgress() {
@@ -910,12 +1029,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             is MeetingService.MeetingState.Connected -> {
                 // add this flag to avoid screen shots.
                 // This also allows protection of screen during screen casts from 3rd party apps.
-                window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                if (binding.joinInfo.cbShowIsc.isChecked) {
+                    meetingService.setVideoLayout(MeetingService.VideoLayout.Custom)
+                }
+
                 if (!isCallInProgress) {
                     OnGoingMeetingService.startService(this)
                     activateInMeetingSubscriptions()
                 }
-                showInMeetingFragment()
+                showInMeetingFragment(binding.joinInfo.cbShowIsc.isChecked)
                 hideProgress()
                 if (isReconnecting) {
                     isReconnecting = false
@@ -926,8 +1048,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 endMeeting()
                 removeInMeetingFragment()
                 isInWaitingRoom = false
+                currentPinnedParticipant = null
                 showWaitingRoomUI()
-                window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+             
             }
             is MeetingService.MeetingState.WaitingRoom -> {
                 Timber.tag(TAG).i("Moving to WR")
@@ -939,9 +1062,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 showWaitingRoomUI()
             }
             is MeetingService.MeetingState.Connecting -> {
-                meetingService.setAudioMuted(isAudioMuted)
-                meetingService.setVideoMuted(isVideoMuted)
-                videoDeviceService.enableSelfVideoPreview(false)
                 isInWaitingRoom = false
                 showWaitingRoomUI()
                 showInMeetingView()
@@ -969,6 +1089,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         override fun showVideoDeviceView() {
             showVideoDeviceDialog()
+        }
+
+        override fun showIscUseCases() {
+            if (meetingService.videoLayout.value != MeetingService.VideoLayout.Custom) {
+                meetingService.setVideoLayout(MeetingService.VideoLayout.Custom)
+            }
+            showIscUseCasesDialog()
+        }
+
+        override fun showIscStreamStyleView() {
+            if (binding.joinInfo.cbShowIsc.isChecked && supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is IscGalleryFragment) {
+                showIscStreamStyleDialog()
+            } else {
+                showToastMessage(resources.getString(R.string.no_stream_styles))
+            }
         }
 
         override fun handleClosedCaptionSwitchEvent(isChecked: Boolean) {
@@ -1004,7 +1139,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         return listOf(
             getString(R.string.people_view),
             getString(R.string.speaker_view),
-            getString(R.string.gallery_view)
+            getString(R.string.gallery_view),
+            getString(R.string.custom_view)
         )
     }
 
@@ -1028,6 +1164,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             .setAdapter(videoDeviceAdapter) { _, position -> selectVideoDevice(position) }
             .create()
         videoDeviceDialog?.show()
+    }
+
+    private fun showIscStreamStyleDialog() {
+        videoDeviceDialog = AlertDialog.Builder(this)
+            .setTitle(getString(R.string.stream_style))
+            .setAdapter(iscStreamStyleAdapter) { _, position -> selectIscStreamStyle(position) }
+            .create()
+        videoDeviceDialog?.show()
+    }
+
+    private fun showIscUseCasesDialog() {
+        iscUseCasesDialog = AlertDialog.Builder(this)
+            .setTitle(getString(R.string.isc_use_case))
+            .setAdapter(iscUseCasesAdapter) { _, position -> selectIscUseCase(position) }
+            .create()
+        iscUseCasesDialog?.show()
     }
 
     private fun showWaitingRoomDialog() {
@@ -1087,6 +1239,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             (view as CheckedTextView).text = getAudioDeviceName(item)
         }
 
+    private fun getIscAdapter(styles: Array<out String>) =
+        MenuItemAdapter(
+            this,
+            android.R.layout.select_dialog_singlechoice, styles.asList()
+        ) { view, item, _ ->
+            (view as CheckedTextView).text = item
+        }
+
     private fun setVideoLayout(videoLayoutName: String?) {
         val videoLayout = when (videoLayoutName) {
             getString(R.string.people_view) ->
@@ -1098,8 +1258,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             getString(R.string.speaker_view) ->
                 MeetingService.VideoLayout.Speaker
 
+            getString(R.string.custom_view) ->
+                MeetingService.VideoLayout.Custom
+
             else -> throw IllegalArgumentException("Invalid video layout")
         }
+
+        if (binding.selfView.selfView.visibility == View.GONE) {
+            binding.selfView.selfView.visibility == View.VISIBLE
+        }
+
+        if (binding.joinInfo.cbShowIsc.isChecked && (supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is IscGalleryFragment ||
+                    supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is RemoteLearningFragment) ||
+            supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is RemoteAssistFragment
+        ) {
+            if (videoLayout != MeetingService.VideoLayout.Custom) {
+                replaceInMeetingFragment(false)
+            }
+        } else if (binding.joinInfo.cbShowIsc.isChecked && videoLayout is MeetingService.VideoLayout.Custom) {
+            replaceInMeetingFragment(true)
+        }
+
         bottomSheetFragment?.updateVideoLayout(videoLayoutName)
         meetingService.setVideoLayout(videoLayout)
     }
@@ -1121,6 +1300,65 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    private fun selectIscStreamStyle(position: Int) {
+        iscStreamStyleAdapter?.updateSelectedPosition(position)
+        val currentStyle = when (position) {
+            0 -> VideoStreamStyle.FIT_TO_VIEW
+            1 -> VideoStreamStyle.SCALE_AND_CROP
+            else -> VideoStreamStyle.FIT_TO_VIEW
+        }
+
+        meetingService.videoStreamService.setVideoStreamStyle(currentStyle)
+
+        if (supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is IscGalleryFragment) {
+            iscGalleryFragment?.let {
+                it.setVideoStreamStyle()
+            }
+        }
+        bottomSheetFragment?.updateVideoStreamStyle(resources.getStringArray(R.array.stream_styles)[position])
+    }
+
+    private fun selectIscUseCase(position: Int) {
+        iscUseCasesAdapter?.updateSelectedPosition(position)
+        when (position) {
+            0 -> {
+                iscGalleryFragment?.onDestroy()
+                inMeetingFragment?.onDestroy()
+                remoteLearningFragment?.onDestroy()
+                remoteAssistFragment?.onDestroy()
+                iscGalleryFragment = IscGalleryFragment()
+                inMeetingFragment = InMeetingFragment()
+                remoteLearningFragment = RemoteLearningFragment()
+                binding.selfView.selfView.visibility = View.GONE
+                val inMeetingFragment = remoteLearningFragment!!
+                supportFragmentManager.beginTransaction()
+                    .replace(
+                        R.id.inMeetingFragmentContainer,
+                        inMeetingFragment
+                    )
+                    .commit()
+            }
+            1 -> {
+                iscGalleryFragment?.onDestroy()
+                inMeetingFragment?.onDestroy()
+                remoteLearningFragment?.onDestroy()
+                remoteAssistFragment?.onDestroy()
+                iscGalleryFragment = IscGalleryFragment()
+                inMeetingFragment = InMeetingFragment()
+                remoteAssistFragment = RemoteAssistFragment()
+                binding.selfView.selfView.visibility = View.GONE
+                val inMeetingFragment = remoteAssistFragment!!
+                supportFragmentManager.beginTransaction()
+                    .replace(
+                        R.id.inMeetingFragmentContainer,
+                        inMeetingFragment
+                    )
+                    .commit()
+            }
+        }
+        bottomSheetFragment?.updateIscUseCase(resources.getStringArray(R.array.isc_use_cases)[position])
+    }
+
     private fun selectVideoLayout(position: Int) {
         videoLayoutAdapter?.updateSelectedPosition(position)
         setVideoLayout(videoLayoutAdapter?.getItem(position))
@@ -1135,15 +1373,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun showCameraSettingsDialog() {
-        val seek = SeekBar(this).apply {
+        zoomSeekBar = SeekBar(this).apply {
             max = 10
             min = 1
             progress = zoomScaleFactor
         }
-        seek.setOnSeekBarChangeListener(zoomSliderChangeListener)
+        zoomSeekBar?.setOnSeekBarChangeListener(zoomSliderChangeListener)
         cameraSettingsDialog = AlertDialog.Builder(this).apply {
             setTitle(getString(R.string.camera_setting_title))
-            setView(seek)
+            setView(zoomSeekBar)
         }.create()
         cameraSettingsDialog?.show()
     }
@@ -1179,6 +1417,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
             MeetingService.VideoLayout.People -> {
                 getString(R.string.people_view)
+            }
+            MeetingService.VideoLayout.Custom -> {
+                getString(R.string.custom_view)
             }
         }
     }
@@ -1234,6 +1475,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             binding.waitingRoomLayout.clWaitingRoom.visibility = View.GONE
         }
         hideProgress()
+    }
+
+    private fun isVideoStreamRoster(): Boolean {
+        return supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is IscGalleryFragment ||
+                supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is RemoteAssistFragment
     }
 
     companion object {

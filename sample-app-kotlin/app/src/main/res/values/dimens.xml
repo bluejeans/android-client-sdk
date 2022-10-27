@@ -19,4 +19,5 @@
     <!--Chat -->
     <dimen name="chat_bubble_max_width">270dp</dimen>
     <dimen name="_4dp">4dp</dimen>
+    <dimen name="isc_tile_width">100dp</dimen>
 </resources>

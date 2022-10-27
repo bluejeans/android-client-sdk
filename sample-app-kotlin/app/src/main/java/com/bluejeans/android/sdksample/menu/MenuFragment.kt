@@ -7,15 +7,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.bjnclientcore.media.sequin.Sequin
+import androidx.constraintlayout.widget.ConstraintSet
 import com.bjnclientcore.ui.util.extensions.gone
 import com.bjnclientcore.ui.util.extensions.visible
 import com.bluejeans.android.sdksample.SampleApplication
 import com.bluejeans.android.sdksample.databinding.FragmentOptionMenuDialogBinding
+import com.bluejeans.bluejeanssdk.meeting.MeetingService
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.plusAssign
 import timber.log.Timber
 
 class MenuFragment(
@@ -28,17 +30,23 @@ class MenuFragment(
     private var videoLayout = ""
     private var currentAudioDevice = ""
     private var currentVideoDevice = ""
+    private var currentStreamStyle = ""
+    private var currentIscUseCase = ""
     private var closedCaptionState = false
     private var hdCaptureState = false
     private var menuFragmentBinding: FragmentOptionMenuDialogBinding? = null
     private var bottomSheetBehavior: BottomSheetBehavior<View>? = null
 
-    private lateinit var disposable: Disposable
+    var isIscEnabled: Boolean = false
+
+    private val disposable: CompositeDisposable = CompositeDisposable()
 
     interface IMenuCallback {
         fun showVideoLayoutView(videoLayoutName: String)
         fun showAudioDeviceView()
         fun showVideoDeviceView()
+        fun showIscStreamStyleView()
+        fun showIscUseCases()
         fun handleClosedCaptionSwitchEvent(isChecked: Boolean)
         fun handleHDCaptureSwitchEvent(isChecked: Boolean)
         fun handleHDReceiveSwitchEvent(isChecked: Boolean)
@@ -63,7 +71,7 @@ class MenuFragment(
             menuFragmentBinding!!.swWaitingRoom.isChecked = isWaitingRoomEnabled
         }
 
-        disposable = SampleApplication.blueJeansSDK.meetingService.moderatorWaitingRoomService.isWaitingRoomEnabled
+        disposable += SampleApplication.blueJeansSDK.meetingService.moderatorWaitingRoomService.isWaitingRoomEnabled
             .rxObservable.observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
@@ -80,12 +88,41 @@ class MenuFragment(
 
     override fun onDestroy() {
         super.onDestroy()
-        disposable.dispose()
+        disposable.clear()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews()
+
+        disposable += SampleApplication.blueJeansSDK.meetingService.videoLayout
+            .rxObservable
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                it.value?.let { videoLayout ->
+                    if (videoLayout == MeetingService.VideoLayout.Custom) {
+                        menuFragmentBinding?.mbIscUseCases?.visibility = View.VISIBLE
+                        menuFragmentBinding?.tvIscUseCases?.visibility = View.VISIBLE
+                        setUIConstraints()
+
+                        menuFragmentBinding?.mbIscUseCases?.setOnClickListener {
+                            menuCallBack.showIscUseCases()
+                            dismiss()
+                        }
+                        menuFragmentBinding?.mbVideoStreamStyle?.setOnClickListener {
+                            menuCallBack.showIscStreamStyleView()
+                            dismiss()
+                        }
+                    } else {
+                        menuFragmentBinding?.mbIscUseCases?.visibility = View.GONE
+                        menuFragmentBinding?.tvIscUseCases?.visibility = View.GONE
+                        menuFragmentBinding?.mbVideoStreamStyle?.isEnabled = false
+                    }
+                }
+            }, {
+                Timber.tag(TAG).e("Error ${it.stackTraceToString()}")
+            })
+
     }
 
     fun updateVideoLayout(videoLayout: String?) {
@@ -102,6 +139,16 @@ class MenuFragment(
 
     fun updateVideoDevice(currentVideoDevice: String?) {
         this.currentVideoDevice = currentVideoDevice!!
+        updateView()
+    }
+
+    fun updateVideoStreamStyle(currentStreamStyle: String) {
+        this.currentStreamStyle = currentStreamStyle
+        updateView()
+    }
+
+    fun updateIscUseCase(useCase: String) {
+        this.currentIscUseCase = useCase;
         updateView()
     }
 
@@ -129,6 +176,28 @@ class MenuFragment(
             dismiss()
         }
 
+        if (isIscEnabled) {
+            menuFragmentBinding?.mbIscUseCases?.visibility = View.VISIBLE
+            menuFragmentBinding?.tvIscUseCases?.visibility = View.VISIBLE
+            setUIConstraints()
+
+            menuFragmentBinding?.mbIscUseCases?.setOnClickListener {
+                menuCallBack.showIscUseCases()
+                dismiss()
+            }
+
+            menuFragmentBinding?.mbVideoStreamStyle?.isEnabled = true
+
+            menuFragmentBinding?.mbVideoStreamStyle?.setOnClickListener {
+                menuCallBack.showIscStreamStyleView()
+                dismiss()
+            }
+        } else {
+            menuFragmentBinding?.mbIscUseCases?.visibility = View.GONE
+            menuFragmentBinding?.tvIscUseCases?.visibility = View.GONE
+            menuFragmentBinding?.mbVideoStreamStyle?.isEnabled = false
+        }
+
         val closedCaptionFeatureObservable =
             SampleApplication.blueJeansSDK.meetingService.closedCaptioningService.isClosedCaptioningAvailable
         if (closedCaptionFeatureObservable.value == true) {
@@ -146,7 +215,8 @@ class MenuFragment(
         }
 
 
-        hdCaptureState = SampleApplication.blueJeansSDK.videoDeviceService.is720pVideoCaptureEnabled.value
+        hdCaptureState =
+            SampleApplication.blueJeansSDK.videoDeviceService.is720pVideoCaptureEnabled.value
         menuFragmentBinding?.swHDCapture?.isChecked = hdCaptureState
         menuFragmentBinding?.swHDCapture?.setOnCheckedChangeListener { buttonView, isChecked ->
             if (buttonView.isPressed) {
@@ -154,7 +224,8 @@ class MenuFragment(
             }
         }
 
-        menuFragmentBinding?.swHDReceive?.isChecked = SampleApplication.blueJeansSDK.videoDeviceService.is720pVideoReceiveEnabled.value == true
+        menuFragmentBinding?.swHDReceive?.isChecked =
+            SampleApplication.blueJeansSDK.videoDeviceService.is720pVideoReceiveEnabled.value == true
         menuFragmentBinding?.swHDReceive?.setOnCheckedChangeListener { buttonView, isChecked ->
             menuCallBack.handleHDReceiveSwitchEvent(isChecked)
         }
@@ -185,6 +256,35 @@ class MenuFragment(
             it.mbVideoLayout.text = videoLayout
             it.mbAudioDevice.text = currentAudioDevice
             it.mbVideoDevice.text = currentVideoDevice
+            it.mbVideoStreamStyle.text = currentStreamStyle
+            it.mbIscUseCases.text = currentIscUseCase
+        }
+    }
+
+    private fun setUIConstraints() {
+        menuFragmentBinding?.let {
+            var set = ConstraintSet()
+            val btnApplyStreamStyle = it.mbVideoStreamStyle
+            val horizontalLine = it.horizontalLine
+            set.clone(it.controls)
+            set.connect(
+                btnApplyStreamStyle.id,
+                ConstraintSet.BOTTOM,
+                it.tvIscUseCases.id,
+                ConstraintSet.TOP
+            )
+
+            set.applyTo(it.controls)
+
+            set = ConstraintSet()
+            set.clone(it.controls)
+            set.connect(
+                horizontalLine.id,
+                ConstraintSet.TOP,
+                it.mbIscUseCases.id,
+                ConstraintSet.BOTTOM
+            )
+            set.applyTo(it.controls)
         }
     }
 

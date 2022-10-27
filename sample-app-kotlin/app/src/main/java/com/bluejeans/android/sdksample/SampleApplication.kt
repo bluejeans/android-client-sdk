@@ -7,8 +7,6 @@ import android.app.Application
 import android.util.Log
 import com.bluejeans.bluejeanssdk.BlueJeansSDK
 import com.bluejeans.bluejeanssdk.BlueJeansSDKInitParams
-import com.bluejeans.bluejeanssdk.GalleryLayoutConfiguration
-import com.bluejeans.bluejeanssdk.VideoConfiguration
 
 class SampleApplication : Application() {
     override fun onCreate() {
@@ -23,7 +21,7 @@ class SampleApplication : Application() {
 
     private fun initSDK() {
         try {
-            blueJeansSDK = BlueJeansSDK(BlueJeansSDKInitParams(this,videoConfiguration = VideoConfiguration(GalleryLayoutConfiguration.FiveByFive)))
+            blueJeansSDK = BlueJeansSDK(BlueJeansSDKInitParams(this))
         } catch (ex: Exception) {
             throw ex
         }

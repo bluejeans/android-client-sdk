@@ -2,6 +2,7 @@
     <string name="app_name">BlueJeansSDK</string>
     <string name="connecting">Connecting to meeting. Please wait.</string>
     <string name="connectingState">Connecting…</string>
+    <string name="custom_view">Custom View</string>
     <string name="people_view">People View</string>
     <string name="gallery_view">Gallery View</string>
     <string name="speaker_view">Speaker View</string>
@@ -11,6 +12,7 @@
     <string name="video_layout">Video Layout</string>
     <string name="audio_device">Audio Device</string>
     <string name="video_device">Video Device</string>
+    <string name="stream_style">Video Stream Style</string>
     <string name="people">People</string>
     <string name="screen_share_notification_message">In Meeting, Content sharing is in progress.</string>
     <string name="meeting_notification_message">In Meeting</string>
@@ -22,6 +24,8 @@
     <string name="no_wr_participants">There are no participants in waiting room</string>
     <string name="multiple_participants_arrived_wr">Multiple participants have arrived in the waiting room</string>
     <string name="multiple_participants_left_wr">Multiple participants have left the waiting room</string>
+    <string name="pin">Pin</string>
+    <string name="apply">Apply</string>
 
     <string name="participant">Participants</string>
     <string name="menu_option">"Menu "</string>
@@ -38,6 +42,7 @@
     <string name="togglecc">CC</string>
     <string name="hd_capture">720 Capture</string>
     <string name="hd_receive">720 Receive</string>
+    <string name="show_isc">Show individual streams</string>
 
     <string name="waiting_room">Waiting Room</string>
     <string name="waiting_room_message">You are in waiting room. Waiting for the moderator to approve/deny your join request.</string>
@@ -51,4 +56,19 @@
     <string name="reconnecting">Reconnecting...</string>
     <string name="reconnected">Reconnected</string>
     <string name="meeting_in_progress">A meeting is already in progress.</string>
+    <string name="isc_use_case">ISC Use Cases</string>
+    <string name="priority_error">Cannot set priority without changing resolution. Re-apply priority along with new resolution.</string>
+    <string name="no_stream_styles">Cannot apply stream styles when not in Custom Layout.</string>
+
+    <string name="press_back">Press back to exit</string>
+
+    <string-array name="stream_styles">
+        <item>Fit To View</item>
+        <item>Crop and Zoom</item>
+    </string-array>
+
+    <string-array name="isc_use_cases">
+        <item>Remote Learning</item>
+        <item>Remote Assist</item>
+    </string-array>
 </resources>
