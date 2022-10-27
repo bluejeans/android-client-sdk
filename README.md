@@ -37,12 +37,13 @@ With BlueJeans Android Client SDK, participants can join video conference meetin
 - Waiting room
 - Active Speaker
 - Remote and Local mute information
-
-## New Features :
 - 720p video capture
 - 720p video receive
 
-## Current Version : 1.5.0
+## New Features :
+- Individual video streams
+
+## Current Version : 1.6.0
 
 ## Pre-requisites :
 - **Android API level :** Min level 26
