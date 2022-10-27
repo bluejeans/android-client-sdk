@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bjn_background_participant_tile"
+    tools:context=".isc.usecases.RemoteAssistFragment">
+
+
+    <TextureView
+        android:id="@+id/remoteAssistTextureView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <View
+        android:id="@+id/vTranslucentBar"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dimen_56"
+        android:layout_marginStart="@dimen/dimen_1"
+        android:layout_marginEnd="@dimen/dimen_1"
+        android:background="@color/bjnTransparentBlackOpacity_50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvParticipantName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_16"
+        android:ellipsize="end"
+        android:fontFamily="@font/roboto_regular"
+        android:letterSpacing="0.01"
+        android:lineSpacingExtra="@dimen/dimen_2_sp"
+        android:maxLines="1"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/dimen_18_sp"
+        app:layout_constraintBottom_toBottomOf="@+id/vTranslucentBar"
+        app:layout_constraintStart_toStartOf="@+id/vTranslucentBar"
+        app:layout_constraintTop_toTopOf="@+id/vTranslucentBar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

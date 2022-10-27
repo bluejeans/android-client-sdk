@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="self_view_ratio">W,1.33</string>
+    <dimen name="isc_tile_width">150dp</dimen>
 </resources>

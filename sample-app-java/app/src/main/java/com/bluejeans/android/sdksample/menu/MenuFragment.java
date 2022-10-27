@@ -10,12 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import com.bluejeans.android.sdksample.R;
 import com.bluejeans.android.sdksample.SampleApplication;
-import com.bluejeans.rxextensions.ObservableValue;
+import com.bluejeans.bluejeanssdk.meeting.MeetingService;
 import com.bluejeans.rxextensions.ObservableValueWithOptional;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -29,18 +30,24 @@ public class MenuFragment extends BottomSheetDialogFragment {
 
     private IMenuCallback mIMenuCallback;
     private boolean mIsWaitingRoomEnabled;
-    private MaterialButton mMbVideoLayout, mMbAudioDevice, mMbVideoDevice;
+    private MaterialButton mMbVideoLayout, mMbAudioDevice, mMbVideoDevice, mMbIscStreamStyle, mMbIscUseCases;
     private Button mViewWaitingRoom;
     private String mVideoLayout = "";
     private String mCurrentAudioDevice = "";
     private String mCurrentVideoDevice = "";
+    private String mCurrentStreamStyle = "";
     private boolean mClosedCaptionState = false;
     private boolean mHDCaptureState = false;
     private boolean mHDReceiveState = false;
     private SwitchCompat mSwitchClosedCaption, mSwitchWaitingRoom, mSwitchHDCapture, mSwitch720Receive;
+    private TextView mTvIscUseCase;
     private LinearLayout mWaitingRoomLayout;
 
     private Disposable mWaitingRoomEnablementDisposable;
+
+    public boolean isIscEnabled = false;
+
+    private Disposable disposable;
 
     public interface IMenuCallback {
         void showVideoLayoutView(String videoLayoutName);
@@ -48,6 +55,10 @@ public class MenuFragment extends BottomSheetDialogFragment {
         void showAudioDeviceView();
 
         void showVideoDeviceView();
+
+        void showIscStreamStyleView();
+
+        void showVideoStreamUseCases();
 
         void handleClosedCaptionSwitchEvent(Boolean enabled);
 
@@ -87,6 +98,34 @@ public class MenuFragment extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViews(view);
+
+        disposable = SampleApplication.getBlueJeansSDK().getMeetingService()
+                .getVideoLayout()
+                .getRxObservable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(videoLayoutOptional -> {
+                    if (videoLayoutOptional.getValue() != null && videoLayoutOptional.getValue() instanceof MeetingService.VideoLayout.Custom) {
+                        mTvIscUseCase.setVisibility(View.VISIBLE);
+                        mMbIscUseCases.setVisibility(View.VISIBLE);
+                        mMbIscStreamStyle.setEnabled(true);
+
+                        mMbIscStreamStyle.setOnClickListener(view1 -> {
+                            mIMenuCallback.showIscStreamStyleView();
+                            dismiss();
+                        });
+
+                        mMbIscUseCases.setOnClickListener(view1 -> {
+                            mIMenuCallback.showVideoStreamUseCases();
+                            dismiss();
+                        });
+                    } else {
+                        mTvIscUseCase.setVisibility(View.GONE);
+                        mMbIscUseCases.setVisibility(View.GONE);
+                        mMbIscStreamStyle.setEnabled(false);
+                    }
+                }, err -> {
+                    Log.e(TAG, "Error: " + err.getLocalizedMessage());
+                });
     }
 
     @Override
@@ -111,6 +150,11 @@ public class MenuFragment extends BottomSheetDialogFragment {
         updateView();
     }
 
+    public void updateVideoStreamStyle(String currentStreamStyle) {
+        this.mCurrentStreamStyle = currentStreamStyle;
+        updateView();
+    }
+
     public void updateClosedCaptionSwitchState(boolean isClosedCaptionActive) {
         mClosedCaptionState = isClosedCaptionActive;
     }
@@ -127,6 +171,9 @@ public class MenuFragment extends BottomSheetDialogFragment {
         mSwitchClosedCaption = view.findViewById(R.id.swClosedCaption);
         mSwitchHDCapture = view.findViewById(R.id.swHDCapture);
         mSwitch720Receive = view.findViewById(R.id.swHDReceive);
+        mMbIscStreamStyle = view.findViewById(R.id.mbVideoStreamStyle);
+        mMbIscUseCases = view.findViewById(R.id.mbIscUseCases);
+        mTvIscUseCase = view.findViewById(R.id.tvIscUseCases);
 
         if (SampleApplication.getBlueJeansSDK().getBlueJeansClient().getMeetingSession().isModerator()) {
             mWaitingRoomLayout = view.findViewById(R.id.llWaitingRoom);
@@ -182,6 +229,26 @@ public class MenuFragment extends BottomSheetDialogFragment {
             mSwitchWaitingRoom.setChecked(this.mIsWaitingRoomEnabled);
         }
 
+        if (isIscEnabled) {
+            mTvIscUseCase.setVisibility(View.VISIBLE);
+            mMbIscUseCases.setVisibility(View.VISIBLE);
+            mMbIscStreamStyle.setEnabled(true);
+
+            mMbIscStreamStyle.setOnClickListener(view1 -> {
+                mIMenuCallback.showIscStreamStyleView();
+                dismiss();
+            });
+
+            mMbIscUseCases.setOnClickListener(view1 -> {
+                mIMenuCallback.showVideoStreamUseCases();
+                dismiss();
+            });
+        } else {
+            mTvIscUseCase.setVisibility(View.GONE);
+            mMbIscUseCases.setVisibility(View.GONE);
+            mMbIscStreamStyle.setEnabled(false);
+        }
+
         ObservableValueWithOptional<Boolean> closedCaptionFeatureObservable = SampleApplication.getBlueJeansSDK().getMeetingService()
                 .getClosedCaptioningService().isClosedCaptioningAvailable();
         if (closedCaptionFeatureObservable.getValue() == Boolean.TRUE) {
@@ -225,6 +292,9 @@ public class MenuFragment extends BottomSheetDialogFragment {
         }
         if (mMbVideoDevice != null) {
             mMbVideoDevice.setText(mCurrentVideoDevice);
+        }
+        if (mMbIscStreamStyle != null) {
+            mMbIscStreamStyle.setText(mCurrentStreamStyle);
         }
     }
 

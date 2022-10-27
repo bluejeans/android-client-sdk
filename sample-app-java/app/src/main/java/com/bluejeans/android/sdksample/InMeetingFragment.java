@@ -167,6 +167,8 @@ public class InMeetingFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mViewPager.unregisterOnPageChangeCallback(mPagerCallBackListener);
+        if (mViewPager != null) {
+            mViewPager.unregisterOnPageChangeCallback(mPagerCallBackListener);
+        }
     }
 }

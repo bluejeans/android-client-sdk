@@ -23,13 +23,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -38,14 +38,23 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-
 import com.bjnclientcore.inmeeting.contentshare.ContentShareType;
+import com.bjnclientcore.media.individualstream.StreamPriority;
+import com.bjnclientcore.media.individualstream.StreamQuality;
+import com.bjnclientcore.media.individualstream.VideoStreamStyle;
 import com.bluejeans.android.sdksample.dialog.WaitingRoomDialog;
+import com.bluejeans.android.sdksample.isc.IStreamConfigUpdatedCallback;
+import com.bluejeans.android.sdksample.isc.IscGalleryFragment;
+import com.bluejeans.android.sdksample.isc.usecases.RemoteAssistFragment;
+import com.bluejeans.android.sdksample.isc.usecases.RemoteLearningFragment;
 import com.bluejeans.android.sdksample.menu.MenuFragment;
 import com.bluejeans.android.sdksample.menu.MenuFragment.IMenuCallback;
 import com.bluejeans.android.sdksample.menu.adapters.AudioDeviceAdapter;
 import com.bluejeans.android.sdksample.menu.adapters.VideoDeviceAdapter;
 import com.bluejeans.android.sdksample.menu.adapters.VideoLayoutAdapter;
+import com.bluejeans.android.sdksample.menu.adapters.VideoStreamStyleAdapter;
+import com.bluejeans.android.sdksample.menu.adapters.VideoStreamUseCasesAdapter;
+import com.bluejeans.android.sdksample.participantlist.IscParticipantListFragment;
 import com.bluejeans.android.sdksample.participantlist.ParticipantListFragment;
 import com.bluejeans.bluejeanssdk.devices.AudioDevice;
 import com.bluejeans.bluejeanssdk.devices.VideoDevice;
@@ -58,11 +67,10 @@ import com.bluejeans.bluejeanssdk.meeting.MeetingService;
 import com.bluejeans.bluejeanssdk.meeting.ParticipantsService;
 import com.bluejeans.bluejeanssdk.meeting.WaitingRoomParticipantEvent;
 import com.bluejeans.bluejeanssdk.permission.PermissionService;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import static com.bluejeans.android.sdksample.utils.AudioDeviceHelper.getAudioDeviceName;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -81,12 +89,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private final CompositeDisposable mDisposable = new CompositeDisposable();
     private final CompositeDisposable mInMeetingDisposable = new CompositeDisposable();
-    private boolean mIsAudioMuted, mIsVideoMuted;
+    private boolean mIsAudioMuted = false, mIsVideoMuted = false, mIsVideoMutedBeforeBackgrounding = false;
     private boolean mIsRemoteContentAvailable;
 
     //View IDs
     private ConstraintLayout mSelfView, mJoinLayout, mWaitingRoomLayout;
     private Button btnJoin, btnExitWaitingRoom;
+    private CheckBox mCbShowIsc;
     private ImageView mIvMic, mIvClose, mIvMenuOption, mIvLogUploadButton;
     private ImageView mIvVideo;
     private EditText mEtEventId, mEtPassCode, mEtName;
@@ -96,24 +105,63 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView mIvScreenShare;
     private ImageView mCameraSettings;
     private MenuFragment mBottomSheetFragment;
+    private IscGalleryFragment iscGalleryFragment;
+    private InMeetingFragment inMeetingFragment;
+    private RemoteLearningFragment remoteLearningFragment;
+    private RemoteAssistFragment remoteAssistFragment;
     private ParticipantListFragment mParticipantListFragment = null;
+    private IscParticipantListFragment mIscParticipantListFragment = null;
 
     //For alter dialog
     private VideoDeviceAdapter mVideoDeviceAdapter = null;
     private AudioDeviceAdapter mAudioDeviceAdapter = null;
     private VideoLayoutAdapter mVideoLayoutAdapter = null;
+    private VideoStreamStyleAdapter mStreamStyleAdapter = null;
+    private VideoStreamUseCasesAdapter mUseCasesAdapter = null;
     private AlertDialog mAudioDialog = null;
     private AlertDialog mVideoLayoutDialog = null;
     private AlertDialog mVideoDeviceDialog = null;
+    private AlertDialog mStreamStyleDialog = null;
+    private AlertDialog mStreamUseCasesDialog = null;
     private AlertDialog mUploadLogsDialog = null;
     private AlertDialog mCameraSettingsDialog = null;
     private ProgressBar mProgressBar = null;
+    private SeekBar zoomSeekBar = null;
     private int mZoomScaleFactor = 1; // default value of 1, no zoom to start with
     private boolean mIsInWaitingRoom = false;
     private boolean mIsWaitingRoomEnabled = false;
     private boolean mIsScreenShareInProgress = false;
     private boolean mIsReconnecting = false;
     private boolean mIsCallInProgress = false;
+    private boolean mIsIscEnabled = false;
+
+    private String mCurrentPinnedParticipant = null;
+
+    private IStreamConfigUpdatedCallback streamConfigUpdatedCallback = new IStreamConfigUpdatedCallback() {
+
+        @Override
+        public void onStreamConfigurationUpdated(String seamGuid, StreamQuality streamQuality, StreamPriority streamPriority) {
+            if (getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof IscGalleryFragment && iscGalleryFragment != null) {
+                iscGalleryFragment.updateStreamConfigurations(seamGuid, streamQuality, streamPriority);
+            }
+        }
+
+        @Override
+        public void pinParticipant(String participantId, Boolean isPinned) {
+            if (getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof IscGalleryFragment && iscGalleryFragment != null) {
+                iscGalleryFragment.pinParticipant(participantId, isPinned);
+                if (mIscParticipantListFragment != null) {
+                    if (isPinned) {
+                        mCurrentPinnedParticipant = participantId;
+                        mIscParticipantListFragment.setPinnedParticipant(participantId);
+                    } else {
+                        mCurrentPinnedParticipant = null;
+                        mIscParticipantListFragment.setPinnedParticipant(null);
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -140,13 +188,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onPause() {
         super.onPause();
+        mIsVideoMutedBeforeBackgrounding = mIsVideoMuted;
         mMeetingService.setVideoMuted(true);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mMeetingService.setVideoMuted(mIsVideoMuted);
+        mMeetingService.setVideoMuted(mIsVideoMutedBeforeBackgrounding);
         if (!mIsScreenShareInProgress) {
             MeetingService.MeetingState meetingState = mMeetingService.getMeetingState().getValue();
             handleMeetingState(meetingState);
@@ -176,11 +225,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.imgClose:
                 mMeetingService.endMeeting();
-                mVideoDeviceService.enableSelfVideoPreview(!mIsVideoMuted);
                 endMeeting();
                 break;
             case R.id.imgMenuOption:
-                mBottomSheetFragment.show(getSupportFragmentManager(), mBottomSheetFragment.getTag());
+                if (mBottomSheetFragment != null) {
+                    mBottomSheetFragment.isIscEnabled = mCbShowIsc.isChecked();
+                    mBottomSheetFragment.show(getSupportFragmentManager(), mBottomSheetFragment.getTag());
+                }
                 break;
             case R.id.ivMic:
                 mIsAudioMuted = !mIsAudioMuted;
@@ -189,19 +240,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.ivVideo:
                 mIsVideoMuted = !mIsVideoMuted;
-                if (areInMeetingServicesAvailable()) {
-                    mMeetingService.setVideoMuted(mIsVideoMuted);
-                } else {
-                    mVideoDeviceService.enableSelfVideoPreview(!mIsVideoMuted);
-                }
+                mMeetingService.setVideoMuted(mIsVideoMuted);
                 toggleVideoMuteUnMuteView(mIsVideoMuted);
                 break;
             case R.id.imgRoster:
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.rosterContainer, mParticipantListFragment)
-                        .addToBackStack("ParticipantListFragment")
-                        .commit();
+                if (isVideoStreamRoster()) {
+                    if (mIscParticipantListFragment != null) {
+                        mIscParticipantListFragment.setPinnedParticipant(mCurrentPinnedParticipant);
+                    }
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.rosterContainer, mIscParticipantListFragment)
+                            .addToBackStack("IscParticipantListFragment")
+                            .commit();
+                } else {
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.rosterContainer, mParticipantListFragment)
+                            .addToBackStack("ParticipantListFragment")
+                            .commit();
+                }
                 break;
             case R.id.imgScreenShare:
                 if (mMeetingService.getContentShareService().getContentShareState().getValue() instanceof ContentShareState.Stopped) {
@@ -357,7 +415,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .beginTransaction()
                 .replace(R.id.selfViewFrame, mVideoDeviceService.getSelfVideoFragment())
                 .commit();
-        mVideoDeviceService.enableSelfVideoPreview(true);
+        mMeetingService.setVideoMuted(false);
     }
 
     private void checkAllPermissionsAndJoin() {
@@ -388,8 +446,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 : mEtName.getText().toString());
         showJoiningInProgressView();
         mInMeetingDisposable.add(mMeetingService.joinMeeting(
-                new MeetingService.JoinParams
-                        (meetingId, passcode, name))
+                        new MeetingService.JoinParams
+                                (meetingId, passcode, name))
                 .subscribeOn(Schedulers.single())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -405,6 +463,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void endMeeting() {
         mIsReconnecting = false;
+        if (mSelfView.getVisibility() == View.GONE) {
+            mSelfView.setVisibility(View.VISIBLE);
+        }
         if (mIsInWaitingRoom) {
             mIsInWaitingRoom = false;
             showWaitingRoomUI();
@@ -442,7 +503,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 showToastMessage("Denied by moderator");
                             } else if (event instanceof MeetingService.WaitingRoomEvent.Demoted) {
                                 showToastMessage("Demoted by moderator");
-                                mVideoDeviceService.enableSelfVideoPreview(!mIsVideoMuted);
                             } else if (event instanceof MeetingService.WaitingRoomEvent.Admitted) {
                                 showToastMessage("Moderator has approved");
                             } else {
@@ -477,6 +537,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 isMuted -> {
                     if (isMuted != null) {
                         // This could be due to local mute or remote mute
+                        mIsAudioMuted = isMuted;
                         toggleAudioMuteUnMuteView(isMuted);
                     }
                     Log.i(TAG, " Audio Mute state " + isMuted);
@@ -493,6 +554,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 isMuted -> {
                     if (isMuted != null) {
                         // This could be due to local mute or remote mute
+                        mIsVideoMuted = isMuted;
                         toggleVideoMuteUnMuteView(isMuted);
                     }
 
@@ -516,9 +578,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             videoLayoutName = getString(R.string.gallery_view);
                         } else if (videoLayout.equals(MeetingService.VideoLayout.People.INSTANCE)) {
                             videoLayoutName = getString(R.string.people_view);
+                        } else if (videoLayout.equals(MeetingService.VideoLayout.Custom.INSTANCE)) {
+                            videoLayoutName = getString(R.string.custom_view);
                         }
-                        mBottomSheetFragment.updateVideoLayout(videoLayoutName);
-                        updateCurrentVideoLayoutForAlertDialog(videoLayoutName);
+
+                        if (getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof IscGalleryFragment &&
+                            videoLayout != MeetingService.VideoLayout.Custom.INSTANCE) {
+                            replaceInMeetingFragment(false);
+                        }
+
+                        if (mSelfView.getVisibility() == View.GONE) {
+                            mSelfView.setVisibility(View.VISIBLE);
+                        }
+
+                        Log.i(TAG, "Received layout from server: " + videoLayoutName);
+                        if (mBottomSheetFragment != null) {
+                            mBottomSheetFragment.updateVideoLayout(videoLayoutName);
+                            updateCurrentVideoLayoutForAlertDialog(videoLayoutName);
+                        }
                     }
                     return Unit.INSTANCE;
                 },
@@ -580,10 +657,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (mParticipantListFragment != null && participantList != null) {
                         mParticipantListFragment.updateMeetingList(participantList);
                     }
+
+                    if (mIscParticipantListFragment != null && participantList != null) {
+                        mIscParticipantListFragment.updateMeetingList(participantList);
+                    }
                     return Unit.INSTANCE;
                 },
                 err -> {
-                    Log.e(TAG, "Error in Participants subscription" + err.getMessage());
+                    Log.e(TAG, "Error in Participants subscription " + err.getMessage());
                     return Unit.INSTANCE;
                 }));
     }
@@ -682,6 +763,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .subscribeOnUI(
                                 hdCaptureState -> {
                                     mBottomSheetFragment.updateHDCaptureState(hdCaptureState);
+                                    if (zoomSeekBar != null) {
+                                        zoomSeekBar.setProgress(1);
+                                    }
                                     return Unit.INSTANCE;
                                 }, err -> {
                                     Log.e(TAG, "Error subscribing hd capture state");
@@ -717,7 +801,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 } else {
                                     mIsWaitingRoomEnabled = false;
                                 }
-                                mBottomSheetFragment = new MenuFragment(mIOptionMenuCallback, mIsWaitingRoomEnabled);
                             }, err -> {
                                 Log.e(TAG, "Error subscribing to waiting room enabled");
                             }
@@ -764,6 +847,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // we are caching the fragment as when user change layout
         // if not cached, fragment dimensions are returned null resulting in no layout being displayed
         // user can also use detach and attach fragments on page listener inorder to relayout.
+
         mIvClose = findViewById(R.id.imgClose);
         mIvMenuOption = findViewById(R.id.imgMenuOption);
         mIvParticipant = findViewById(R.id.imgRoster);
@@ -779,6 +863,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mEtEventId = findViewById(R.id.etEventId);
         mEtPassCode = findViewById(R.id.etPasscode);
         mEtName = findViewById(R.id.etName);
+        mCbShowIsc = findViewById(R.id.cbShowIsc);
         // Waiting Room Layout
         mWaitingRoomLayout = findViewById(R.id.waiting_room_layout);
         //Progress View
@@ -800,21 +885,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mIvVideo.setOnClickListener(this);
         mCameraSettings.setOnClickListener(this);
         mBottomSheetFragment = new MenuFragment(mIOptionMenuCallback, mIsWaitingRoomEnabled);
+        mBottomSheetFragment.updateVideoStreamStyle(getResources().getStringArray(R.array.stream_styles)[0]);
         mParticipantListFragment = new ParticipantListFragment();
+        mIscParticipantListFragment = new IscParticipantListFragment(streamConfigUpdatedCallback, getApplicationContext());
         mVideoLayoutAdapter = getVideoLayoutAdapter();
         mVideoDeviceAdapter = getVideoDeviceAdapter(new ArrayList<>());
         mAudioDeviceAdapter = getAudioDeviceAdapter(new ArrayList<>());
+        mStreamStyleAdapter = getStreamStyleAdapter(Arrays.asList(getResources().getStringArray(R.array.stream_styles)));
+        mUseCasesAdapter = getVideoStreamUseCasesAdapter(Arrays.asList(getResources().getStringArray(R.array.isc_use_cases)));
         mAppVersion.setText(appVersionString);
     }
 
-    private void showInMeetingFragment() {
+    private void showInMeetingFragment(Boolean showIscFragment) {
         if (getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) == null) {
-            InMeetingFragment inMeetingFragment = new InMeetingFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(
-                            R.id.inMeetingFragmentContainer,
-                            inMeetingFragment
-                    ).commit();
+            if (showIscFragment) {
+                iscGalleryFragment = new IscGalleryFragment();
+                getSupportFragmentManager().beginTransaction().replace(
+                        R.id.inMeetingFragmentContainer,
+                        iscGalleryFragment
+                ).commit();
+            } else {
+                inMeetingFragment = new InMeetingFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(
+                                R.id.inMeetingFragmentContainer,
+                                inMeetingFragment
+                        ).commit();
+            }
         }
     }
 
@@ -824,6 +921,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             getSupportFragmentManager().beginTransaction()
                     .remove(inMeetingFragment)
                     .commit();
+    }
+
+    private void replaceInMeetingFragment(Boolean showIscFragment) {
+        if (iscGalleryFragment != null) iscGalleryFragment.onDestroy();
+        if (inMeetingFragment != null) inMeetingFragment.onDestroy();
+        if (remoteLearningFragment != null) remoteLearningFragment.onDestroy();
+        if (remoteAssistFragment != null) remoteAssistFragment.onDestroy();
+        if (showIscFragment) {
+            iscGalleryFragment = new IscGalleryFragment();
+            getSupportFragmentManager().beginTransaction().replace(
+                    R.id.inMeetingFragmentContainer,
+                    iscGalleryFragment
+            ).commit();
+        } else {
+            inMeetingFragment = new InMeetingFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(
+                            R.id.inMeetingFragmentContainer,
+                            inMeetingFragment
+                    ).commit();
+        }
     }
 
     private void showJoiningInProgressView() {
@@ -864,9 +982,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (mBottomSheetFragment != null && mBottomSheetFragment.isAdded()) {
             mBottomSheetFragment.dismiss();
         }
-        if (mParticipantListFragment != null && mParticipantListFragment.isAdded()) {
+        if (mParticipantListFragment != null && mParticipantListFragment.isAdded() && !mCbShowIsc.isChecked()) {
             getSupportFragmentManager().beginTransaction().remove(mParticipantListFragment).commit();
             Fragment fragment = getSupportFragmentManager().findFragmentByTag("ParticipantListFragment");
+            if (fragment != null) {
+                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+            }
+        }
+        if (mIscParticipantListFragment != null && mIscParticipantListFragment.isAdded() && mCbShowIsc.isChecked()) {
+            getSupportFragmentManager().beginTransaction().remove(mIscParticipantListFragment).commit();
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag("IscParticipantListFragment");
             if (fragment != null) {
                 getSupportFragmentManager().beginTransaction().remove(fragment).commit();
             }
@@ -954,6 +1079,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
                 @Override
+                public void showIscStreamStyleView() {
+                    if (mCbShowIsc.isChecked() && getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof IscGalleryFragment) {
+                        showStreamStyleDialog();
+                    } else {
+                        showToastMessage(getResources().getString(R.string.no_stream_styles));
+                    }
+                }
+
+                @Override
+                public void showVideoStreamUseCases() {
+                    if (mMeetingService.getVideoLayout().getValue() != MeetingService.VideoLayout.Custom.INSTANCE) {
+                        mMeetingService.setVideoLayout(MeetingService.VideoLayout.Custom.INSTANCE);
+                    }
+                    showStreamUseCasesDialog();
+                }
+
+                @Override
                 public void handleClosedCaptionSwitchEvent(Boolean enabled) {
                     if (enabled) {
                         mMeetingService.getClosedCaptioningService().startClosedCaptioning();
@@ -993,6 +1135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         videoLayoutList.add(getString(R.string.people_view));
         videoLayoutList.add(getString(R.string.speaker_view));
         videoLayoutList.add(getString(R.string.gallery_view));
+        videoLayoutList.add(getString(R.string.custom_view));
         return videoLayoutList;
     }
 
@@ -1018,6 +1161,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setAdapter(mVideoDeviceAdapter,
                         (dialog, which) -> selectVideoDevice(which)).create();
         mVideoDeviceDialog.show();
+    }
+
+    private void showStreamStyleDialog() {
+        mStreamStyleDialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.video_stream_styles))
+                .setAdapter(mStreamStyleAdapter,
+                        (dialog, which) -> selectStreamStyle(which)).create();
+        mStreamStyleDialog.show();
+    }
+
+    private void showStreamUseCasesDialog() {
+        mStreamUseCasesDialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.isc_use_case))
+                .setAdapter(mUseCasesAdapter,
+                        (dialog, which) -> selectVideoStreamUseCase(which)).create();
+        mStreamUseCasesDialog.show();
     }
 
     private void showWaitingRoomDialog() {
@@ -1063,6 +1222,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 audioDevices);
     }
 
+    private VideoStreamStyleAdapter getStreamStyleAdapter(List<String> styles) {
+        return new VideoStreamStyleAdapter(this, android.R.layout.simple_list_item_single_choice,
+                styles);
+    }
+
+    private VideoStreamUseCasesAdapter getVideoStreamUseCasesAdapter(List<String> useCases) {
+        return new VideoStreamUseCasesAdapter(this, android.R.layout.simple_list_item_single_choice,
+                useCases);
+    }
+
     private void setVideoLayout(String videoLayoutName) {
         MeetingService.VideoLayout videoLayout = null;
         if (videoLayoutName.equals(getString(R.string.people_view))) {
@@ -1071,9 +1240,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             videoLayout = MeetingService.VideoLayout.Gallery.INSTANCE;
         } else if (videoLayoutName.equals(getString(R.string.speaker_view))) {
             videoLayout = MeetingService.VideoLayout.Speaker.INSTANCE;
+        } else if (videoLayoutName.equals(getString(R.string.custom_view))) {
+            videoLayout = MeetingService.VideoLayout.Custom.INSTANCE;
         }
         if (videoLayout != null) {
+            if (mCbShowIsc.isChecked() && (getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof IscGalleryFragment ||
+                    getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof RemoteLearningFragment ||
+                    getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof RemoteAssistFragment)) {
+                if (videoLayout != MeetingService.VideoLayout.Custom.INSTANCE) {
+                    mIsIscEnabled = false;
+                    replaceInMeetingFragment(false);
+                }
+            } else if (mCbShowIsc.isChecked() && videoLayout == MeetingService.VideoLayout.Custom.INSTANCE) {
+                mIsIscEnabled = true;
+                replaceInMeetingFragment(true);
+            }
             mMeetingService.setVideoLayout(videoLayout);
+            if (mBottomSheetFragment != null) {
+                mBottomSheetFragment.updateVideoLayout(videoLayoutName);
+                updateCurrentVideoLayoutForAlertDialog(videoLayoutName);
+            }
         }
     }
 
@@ -1088,6 +1274,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         VideoDevice videoDevice = mVideoDeviceAdapter.getItem(position);
         closeCameraSettings();
         mVideoDeviceService.selectVideoDevice(videoDevice);
+    }
+
+    private void selectStreamStyle(int position) {
+        mStreamStyleAdapter.updateSelectedPosition(position);
+        String style = mStreamStyleAdapter.getItem(position);
+        if (position == 0) {
+            mMeetingService.getVideoStreamService()
+                    .setVideoStreamStyle(VideoStreamStyle.FIT_TO_VIEW);
+        } else {
+            mMeetingService.getVideoStreamService()
+                    .setVideoStreamStyle(VideoStreamStyle.SCALE_AND_CROP);
+        }
+
+        if (getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof IscGalleryFragment &&
+                iscGalleryFragment != null) {
+            iscGalleryFragment.setVideoStreamStyle();
+        }
+
+        mBottomSheetFragment.updateVideoStreamStyle(style);
+    }
+
+    private void selectVideoStreamUseCase(int position) {
+        mUseCasesAdapter.updateSelectedPosition(position);
+        switch (position) {
+            case 0:
+                if (iscGalleryFragment != null) iscGalleryFragment.onDestroy();
+                if (inMeetingFragment != null) inMeetingFragment.onDestroyView();
+                if (remoteLearningFragment != null) remoteLearningFragment.onDestroy();
+                if (remoteAssistFragment != null) remoteAssistFragment.onDestroy();
+
+                iscGalleryFragment = new IscGalleryFragment();
+                inMeetingFragment = new InMeetingFragment();
+                remoteLearningFragment = new RemoteLearningFragment();
+                mSelfView.setVisibility(View.GONE);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.inMeetingFragmentContainer, remoteLearningFragment)
+                        .commit();
+                break;
+
+            case 1:
+                if (iscGalleryFragment != null) iscGalleryFragment.onDestroy();
+                if (inMeetingFragment != null) inMeetingFragment.onDestroyView();
+                if (remoteLearningFragment != null) remoteLearningFragment.onDestroy();
+                if (remoteAssistFragment != null) remoteAssistFragment.onDestroy();
+
+                iscGalleryFragment = new IscGalleryFragment();
+                inMeetingFragment = new InMeetingFragment();
+                remoteAssistFragment = new RemoteAssistFragment();
+                mSelfView.setVisibility(View.GONE);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.inMeetingFragmentContainer, remoteAssistFragment)
+                        .commit();
+                break;
+        }
     }
 
     private void selectVideoLayout(int position) {
@@ -1105,15 +1345,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void showCameraSettingsDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final SeekBar seek = new SeekBar(this);
-        seek.setMax(10);
-        seek.setMin(1);
-        seek.setProgress(mZoomScaleFactor);
+        zoomSeekBar = new SeekBar(this);
+        zoomSeekBar.setMax(10);
+        zoomSeekBar.setMin(1);
+        zoomSeekBar.setProgress(mZoomScaleFactor);
         builder.setTitle(getString(R.string.camera_setting_title));
-        builder.setView(seek);
+        builder.setView(zoomSeekBar);
         try {
             CameraCharacteristics cameraCharacteristics = getCurrentCameraCharacteristics();
-            seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            zoomSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     mZoomScaleFactor = progress;
@@ -1146,11 +1386,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // This also allows protection of screen during screen casts from 3rd party apps.
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
             if (!mIsCallInProgress) {
+                if (mCbShowIsc.isChecked()) {
+                    mMeetingService.setVideoLayout(MeetingService.VideoLayout.Custom.INSTANCE);
+                }
                 OnGoingMeetingService.startService(getApplicationContext());
                 activateInMeetingSubscriptions();
             }
             hideProgress();
-            showInMeetingFragment();
+            showInMeetingFragment(mCbShowIsc.isChecked());
             if (mIsReconnecting) {
                 mIsReconnecting = false;
                 showToastMessage(getString(R.string.reconnected));
@@ -1159,6 +1402,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             endMeeting();
             removeInMeetingFragment();
             mIsInWaitingRoom = false;
+            mCurrentPinnedParticipant = null;
             showWaitingRoomUI();
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
         } else if (meetingState instanceof MeetingService.MeetingState.WaitingRoom) {
@@ -1169,9 +1413,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showOutOfMeetingView();
             showWaitingRoomUI();
         } else if (meetingState instanceof MeetingService.MeetingState.Connecting) {
-            mMeetingService.setAudioMuted(mIsAudioMuted);
-            mMeetingService.setVideoMuted(mIsVideoMuted);
-            mVideoDeviceService.enableSelfVideoPreview(false);
             mIsInWaitingRoom = false;
             showWaitingRoomUI();
             showInMeetingView();
@@ -1193,7 +1434,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * x and y coordinates and divide by zoom scale factor to get updated camera's region.
      *
      * @param cameraActiveRegion active area of the image sensor.
-     * @param zoomFactor scale factor
+     * @param zoomFactor         scale factor
      * @return Rect coordinates of crop region to be zoomed.
      */
     private Rect getCropRegionForZoom(Rect cameraActiveRegion, int zoomFactor) {
@@ -1241,5 +1482,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mWaitingRoomLayout.setVisibility(View.GONE);
         }
         hideProgress();
+    }
+
+    private Boolean isVideoStreamRoster() {
+        return getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof IscGalleryFragment ||
+            getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof RemoteAssistFragment;
     }
 }

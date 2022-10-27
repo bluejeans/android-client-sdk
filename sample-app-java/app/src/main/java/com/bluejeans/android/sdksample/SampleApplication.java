@@ -3,13 +3,10 @@
  */
 package com.bluejeans.android.sdksample;
 
-import com.bluejeans.bluejeanssdk.BlueJeansSDK;
-import com.bluejeans.bluejeanssdk.BlueJeansSDKInitParams;
-import com.bluejeans.bluejeanssdk.GalleryLayoutConfiguration;
-import com.bluejeans.bluejeanssdk.VideoConfiguration;
-
 import android.app.Application;
 import android.util.Log;
+import com.bluejeans.bluejeanssdk.BlueJeansSDK;
+import com.bluejeans.bluejeanssdk.BlueJeansSDKInitParams;
 
 public class SampleApplication extends Application {
 
@@ -29,7 +26,7 @@ public class SampleApplication extends Application {
 
     private void initSDK() {
         try {
-            blueJeansSDK = new BlueJeansSDK(new BlueJeansSDKInitParams(this, false, new VideoConfiguration(new GalleryLayoutConfiguration.FiveByFive())));
+            blueJeansSDK = new BlueJeansSDK(new BlueJeansSDKInitParams(this));
         } catch (Exception ex) {
             Log.e(TAG, "Exception while initiating sdk " + ex.getMessage());
         }
