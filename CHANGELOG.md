@@ -142,3 +142,20 @@ Features / Changes:
 - 720p video send and recieve
 - Target OS level 12
 - Misc bug fixes
+
+Version 1.6.0 *(10-2022)*
+---------------------------------
+Features / Changes:
+### 🚨 ***Breaking Changes*** 
+
+- meetingService.setAudioMuted, and meetingService.setVideoMuted may now be set prior to joining a meeting,
+or while in the waiting room. Any updates to the localMuted state will be retained across SDK lifecycle.
+
+### New License
+See the updated LICENSE
+
+### Features
+#### Individual Stream Control
+- Create custom layouts and set the VideoLayout to `Custom`
+- Request specific streams of video with different configurations of your choice using the `VideoStreamService`
+- Render videos with different styles in your own custom sized views with `attachParticipantStreamToView`
