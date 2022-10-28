@@ -148,6 +148,7 @@ Version 1.6.0 *(10-2022)*
 Features / Changes:
 ### 🚨 ***Breaking Changes*** 
 
+- videoDeviceService.enableSelfVideoPreview is no longer available. We recommend you to use meetingService.setVideoMuted instead
 - meetingService.setAudioMuted, and meetingService.setVideoMuted may now be set prior to joining a meeting,
 or while in the waiting room. Any updates to the localMuted state will be retained across SDK lifecycle.
 
