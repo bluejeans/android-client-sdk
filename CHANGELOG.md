@@ -153,7 +153,7 @@ Features / Changes:
 or while in the waiting room. Any updates to the localMuted state will be retained across SDK lifecycle.
 
 ### New License
-See the updated LICENSE
+See the updated [License.md](LICENSE.md)
 
 ### Features
 #### Individual Stream Control
