@@ -81,4 +81,3 @@ This BlueJeans Developer Agreement ("Agreement") is a legal agreement between yo
 
 * **Cookies –** We use cookies to enhance Your experience. We may share Your information with our advertising and analytic partners. Find out more about cookies by reading our Cookies Policy, which contains further information about the cookies and other technologies we use and information about how to disable them. By using the BlueJeans Code You agree to our use of cookies and similar technologies. 
 
-
