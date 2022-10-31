@@ -160,3 +160,4 @@ See the updated [License.md](LICENSE.md)
 - Create custom layouts and set the VideoLayout to `Custom`
 - Request specific streams of video with different configurations of your choice using the `VideoStreamService`
 - Render videos with different styles in your own custom sized views with `attachParticipantStreamToView`
+- Two new use cases namely remote learning and remote assist based on individual stream support have added in the sample app
