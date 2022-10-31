@@ -1038,7 +1038,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 isInWaitingRoom = false
                 currentPinnedParticipant = null
                 showWaitingRoomUI()
-             
+//                window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
             }
             is MeetingService.MeetingState.WaitingRoom -> {
                 Timber.tag(TAG).i("Moving to WR")

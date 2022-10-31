@@ -58,9 +58,10 @@
     <string name="meeting_in_progress">A meeting is already in progress.</string>
     <string name="isc_use_case">ISC Use Cases</string>
     <string name="priority_error">Cannot set priority without changing resolution. Re-apply priority along with new resolution.</string>
-    <string name="no_stream_styles">Cannot apply stream styles when not in Custom Layout.</string>
+    <string name="no_stream_styles">Cannot apply stream styles when ISC use cases are active.</string>
 
     <string name="press_back">Press back to exit</string>
+    <string name="no_individual_streams">\"Show individual streams\" was not selected while joining</string>
 
     <string-array name="stream_styles">
         <item>Fit To View</item>

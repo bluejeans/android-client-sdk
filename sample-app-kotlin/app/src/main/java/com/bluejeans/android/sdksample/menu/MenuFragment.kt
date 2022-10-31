@@ -22,8 +22,9 @@ import timber.log.Timber
 
 class MenuFragment(
     private val menuCallBack: IMenuCallback,
-    private val isWaitingRoomEnabled: Boolean
-    ) : BottomSheetDialogFragment() {
+    private val isWaitingRoomEnabled: Boolean,
+    private val isIscSelected: Boolean
+) : BottomSheetDialogFragment() {
 
     private val TAG = "MenuFragment"
 
@@ -36,8 +37,6 @@ class MenuFragment(
     private var hdCaptureState = false
     private var menuFragmentBinding: FragmentOptionMenuDialogBinding? = null
     private var bottomSheetBehavior: BottomSheetBehavior<View>? = null
-
-    var isIscEnabled: Boolean = false
 
     private val disposable: CompositeDisposable = CompositeDisposable()
 
@@ -103,6 +102,8 @@ class MenuFragment(
                     if (videoLayout == MeetingService.VideoLayout.Custom) {
                         menuFragmentBinding?.mbIscUseCases?.visibility = View.VISIBLE
                         menuFragmentBinding?.tvIscUseCases?.visibility = View.VISIBLE
+                        menuFragmentBinding?.mbVideoStreamStyle?.visibility = View.VISIBLE
+                        menuFragmentBinding?.tvStreamStyle?.visibility = View.VISIBLE
                         setUIConstraints()
 
                         menuFragmentBinding?.mbIscUseCases?.setOnClickListener {
@@ -116,7 +117,8 @@ class MenuFragment(
                     } else {
                         menuFragmentBinding?.mbIscUseCases?.visibility = View.GONE
                         menuFragmentBinding?.tvIscUseCases?.visibility = View.GONE
-                        menuFragmentBinding?.mbVideoStreamStyle?.isEnabled = false
+                        menuFragmentBinding?.mbVideoStreamStyle?.visibility = View.GONE
+                        menuFragmentBinding?.tvStreamStyle?.visibility = View.GONE
                     }
                 }
             }, {
@@ -176,17 +178,17 @@ class MenuFragment(
             dismiss()
         }
 
-        if (isIscEnabled) {
+        if (isIscSelected) {
             menuFragmentBinding?.mbIscUseCases?.visibility = View.VISIBLE
             menuFragmentBinding?.tvIscUseCases?.visibility = View.VISIBLE
+            menuFragmentBinding?.mbVideoStreamStyle?.visibility = View.VISIBLE
+            menuFragmentBinding?.tvStreamStyle?.visibility = View.VISIBLE
             setUIConstraints()
 
             menuFragmentBinding?.mbIscUseCases?.setOnClickListener {
                 menuCallBack.showIscUseCases()
                 dismiss()
             }
-
-            menuFragmentBinding?.mbVideoStreamStyle?.isEnabled = true
 
             menuFragmentBinding?.mbVideoStreamStyle?.setOnClickListener {
                 menuCallBack.showIscStreamStyleView()
@@ -195,7 +197,8 @@ class MenuFragment(
         } else {
             menuFragmentBinding?.mbIscUseCases?.visibility = View.GONE
             menuFragmentBinding?.tvIscUseCases?.visibility = View.GONE
-            menuFragmentBinding?.mbVideoStreamStyle?.isEnabled = false
+            menuFragmentBinding?.mbVideoStreamStyle?.visibility = View.GONE
+            menuFragmentBinding?.tvStreamStyle?.visibility = View.GONE
         }
 
         val closedCaptionFeatureObservable =

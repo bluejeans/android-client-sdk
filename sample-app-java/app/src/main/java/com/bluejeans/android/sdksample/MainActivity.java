@@ -229,7 +229,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.imgMenuOption:
                 if (mBottomSheetFragment != null) {
-                    mBottomSheetFragment.isIscEnabled = mCbShowIsc.isChecked();
                     mBottomSheetFragment.show(getSupportFragmentManager(), mBottomSheetFragment.getTag());
                 }
                 break;
@@ -884,7 +883,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mIvMic.setOnClickListener(this);
         mIvVideo.setOnClickListener(this);
         mCameraSettings.setOnClickListener(this);
-        mBottomSheetFragment = new MenuFragment(mIOptionMenuCallback, mIsWaitingRoomEnabled);
+        mBottomSheetFragment = new MenuFragment(mIOptionMenuCallback, mIsWaitingRoomEnabled, mCbShowIsc.isChecked());
         mBottomSheetFragment.updateVideoStreamStyle(getResources().getStringArray(R.array.stream_styles)[0]);
         mParticipantListFragment = new ParticipantListFragment();
         mIscParticipantListFragment = new IscParticipantListFragment(streamConfigUpdatedCallback, getApplicationContext());
@@ -1254,11 +1253,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else if (mCbShowIsc.isChecked() && videoLayout == MeetingService.VideoLayout.Custom.INSTANCE) {
                 mIsIscEnabled = true;
                 replaceInMeetingFragment(true);
+            } else if (!mCbShowIsc.isChecked() && videoLayout == MeetingService.VideoLayout.Custom.INSTANCE) {
+                showToastMessage(getString(R.string.no_individual_streams));
+                return;
             }
             mMeetingService.setVideoLayout(videoLayout);
             if (mBottomSheetFragment != null) {
                 mBottomSheetFragment.updateVideoLayout(videoLayoutName);
                 updateCurrentVideoLayoutForAlertDialog(videoLayoutName);
+            }
+
+            if (!videoLayoutName.equals(getString(R.string.custom_view)) && mSelfView.getVisibility() == View.GONE) {
+                mSelfView.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -1297,6 +1303,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void selectVideoStreamUseCase(int position) {
         mUseCasesAdapter.updateSelectedPosition(position);
+        mMeetingService.getVideoStreamService().setVideoStreamStyle(VideoStreamStyle.FIT_TO_VIEW);
+        mStreamStyleAdapter.updateSelectedPosition(0);
+        mBottomSheetFragment.updateVideoStreamStyle(getResources().getStringArray(R.array.stream_styles)[0]);
         switch (position) {
             case 0:
                 if (iscGalleryFragment != null) iscGalleryFragment.onDestroy();
@@ -1384,7 +1393,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (meetingState instanceof MeetingService.MeetingState.Connected) {
             // add this flag to avoid screen shots.
             // This also allows protection of screen during screen casts from 3rd party apps.
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
             if (!mIsCallInProgress) {
                 if (mCbShowIsc.isChecked()) {
                     mMeetingService.setVideoLayout(MeetingService.VideoLayout.Custom.INSTANCE);
@@ -1404,7 +1413,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mIsInWaitingRoom = false;
             mCurrentPinnedParticipant = null;
             showWaitingRoomUI();
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
         } else if (meetingState instanceof MeetingService.MeetingState.WaitingRoom) {
             removeInMeetingFragment();
             mIsInWaitingRoom = true;

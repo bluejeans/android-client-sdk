@@ -3,10 +3,13 @@ package com.bluejeans.android.sdksample.isc.usecases;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import com.bjnclientcore.media.individualstream.StreamPriority;
@@ -77,6 +80,7 @@ public class RemoteAssistFragment extends Fragment {
                         binding.remoteAssistTextureView
                 );
                 binding.tvParticipantName.setText(participantUI.getName());
+                setTextureViewConstraints(participantUI.getVideoWidth(), participantUI.getVideoHeight(), binding.remoteAssistTextureView);
             } else {
                 Log.e(TAG, "Stream failure " + result);
             }
@@ -90,6 +94,23 @@ public class RemoteAssistFragment extends Fragment {
         binding = null;
         if (participantConfiguration != null) {
             viewModel.detachParticipantFromView(participantConfiguration.getParticipantGuid());
+        }
+    }
+
+    private void setTextureViewConstraints(int videoWidth, int videoHeight, TextureView textureView) {
+        if (videoHeight > 0 && videoWidth > 0) {
+            ConstraintSet set = new ConstraintSet();
+            set.clone(binding.getRoot());
+            set.connect(textureView.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT);
+            set.connect(textureView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT);
+            set.connect(textureView.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+            set.connect(textureView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+
+            float ratio = (float) videoWidth / videoHeight;
+            Log.i(TAG, "Ratio: " + ratio);
+            set.setDimensionRatio(textureView.getId(), String.valueOf(ratio));
+
+            set.applyTo(binding.getRoot());
         }
     }
 }

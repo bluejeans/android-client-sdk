@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -50,12 +51,12 @@ public class RemoteLearningFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        studentTextureViews.add(0, binding.studentOne);
-        studentTextureViews.add(1, binding.studentTwo);
-        studentTextureViews.add(2, binding.studentThree);
-        studentTextureViews.add(3, binding.studentFour);
-        studentTextureViews.add(4, binding.studentFive);
-        studentTextureViews.add(5, binding.studentSix);
+        studentTextureViews.add(0, binding.studentOne.participantTextureView);
+        studentTextureViews.add(1, binding.studentTwo.participantTextureView);
+        studentTextureViews.add(2, binding.studentThree.participantTextureView);
+        studentTextureViews.add(3, binding.studentFour.participantTextureView);
+        studentTextureViews.add(4, binding.studentFive.participantTextureView);
+        studentTextureViews.add(5, binding.studentSix.participantTextureView);
 
         viewModel = new ViewModelProvider(this).get(RemoteLearningViewModel.class);
         viewModel.participantsObservable.observe(getViewLifecycleOwner(), studentsList -> {
@@ -180,6 +181,25 @@ public class RemoteLearningFragment extends Fragment {
         set.applyTo(binding.layoutMainStage.getRoot());
     }
 
+    private void setStudentTextureViewConstraints(int videoWidth, int videoHeight, TextureView textureView) {
+        ConstraintSet set = new ConstraintSet();
+        set.clone(binding.layoutMainStage.getRoot());
+        set.connect(textureView.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT);
+        set.connect(textureView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT);
+        set.connect(textureView.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+        set.connect(textureView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+
+        if (moderator != null) {
+            if (videoWidth > 0 && videoHeight > 0) {
+                float ratio = ((float) videoWidth / videoHeight);
+                Log.i(TAG, "Ratio: " + ratio);
+                set.setDimensionRatio(textureView.getId(), String.valueOf(ratio));
+            }
+        }
+
+        set.applyTo((ConstraintLayout) textureView.getParent());
+    }
+
     private void updateStudentsUI() {
         List<RemoteLearningParticipant> stds = students.stream().filter(it -> !it.isModerator()).collect(Collectors.toList());
         for (int i = 0; i < stds.size(); i++) {
@@ -187,6 +207,11 @@ public class RemoteLearningFragment extends Fragment {
             if (stds.get(i).isVideo()) {
                 studentTextureViews.get(i).setVisibility(View.VISIBLE);
                 attachStudentStream(stds.get(i), studentTextureViews.get(i));
+                setStudentTextureViewConstraints(
+                        stds.get(i).getWidth(),
+                        stds.get(i).getHeight(),
+                        studentTextureViews.get(i)
+                );
             }
         }
     }

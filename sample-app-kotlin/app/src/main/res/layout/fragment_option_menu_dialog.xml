@@ -91,7 +91,6 @@
             android:id="@+id/mbVideoStreamStyle"
             style="@style/MaterialDropDownButton"
             android:hint="@string/stream_style"
-            android:enabled="false"
             app:layout_constraintBottom_toTopOf="@id/horizontalLine"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

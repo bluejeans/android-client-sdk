@@ -39,13 +39,12 @@ public class MenuFragment extends BottomSheetDialogFragment {
     private boolean mClosedCaptionState = false;
     private boolean mHDCaptureState = false;
     private boolean mHDReceiveState = false;
+    private boolean isIscSelected = false;
     private SwitchCompat mSwitchClosedCaption, mSwitchWaitingRoom, mSwitchHDCapture, mSwitch720Receive;
-    private TextView mTvIscUseCase;
+    private TextView mTvIscUseCase, mTvVideoStreamStyle;
     private LinearLayout mWaitingRoomLayout;
 
     private Disposable mWaitingRoomEnablementDisposable;
-
-    public boolean isIscEnabled = false;
 
     private Disposable disposable;
 
@@ -71,9 +70,10 @@ public class MenuFragment extends BottomSheetDialogFragment {
         void setWaitingRoomEnabled(boolean enabled);
     }
 
-    public MenuFragment(IMenuCallback iMenuCallback, boolean isWaitingRoomEnabled) {
+    public MenuFragment(IMenuCallback iMenuCallback, boolean isWaitingRoomEnabled, boolean isIscSelected) {
         mIMenuCallback = iMenuCallback;
         mIsWaitingRoomEnabled = isWaitingRoomEnabled;
+        this.isIscSelected = isIscSelected;
     }
 
     @Override
@@ -107,7 +107,8 @@ public class MenuFragment extends BottomSheetDialogFragment {
                     if (videoLayoutOptional.getValue() != null && videoLayoutOptional.getValue() instanceof MeetingService.VideoLayout.Custom) {
                         mTvIscUseCase.setVisibility(View.VISIBLE);
                         mMbIscUseCases.setVisibility(View.VISIBLE);
-                        mMbIscStreamStyle.setEnabled(true);
+                        mMbIscStreamStyle.setVisibility(View.VISIBLE);
+                        mTvVideoStreamStyle.setVisibility(View.VISIBLE);
 
                         mMbIscStreamStyle.setOnClickListener(view1 -> {
                             mIMenuCallback.showIscStreamStyleView();
@@ -121,7 +122,8 @@ public class MenuFragment extends BottomSheetDialogFragment {
                     } else {
                         mTvIscUseCase.setVisibility(View.GONE);
                         mMbIscUseCases.setVisibility(View.GONE);
-                        mMbIscStreamStyle.setEnabled(false);
+                        mMbIscStreamStyle.setVisibility(View.GONE);
+                        mTvVideoStreamStyle.setVisibility(View.GONE);
                     }
                 }, err -> {
                     Log.e(TAG, "Error: " + err.getLocalizedMessage());
@@ -174,6 +176,7 @@ public class MenuFragment extends BottomSheetDialogFragment {
         mMbIscStreamStyle = view.findViewById(R.id.mbVideoStreamStyle);
         mMbIscUseCases = view.findViewById(R.id.mbIscUseCases);
         mTvIscUseCase = view.findViewById(R.id.tvIscUseCases);
+        mTvVideoStreamStyle = view.findViewById(R.id.tvStreamStyle);
 
         if (SampleApplication.getBlueJeansSDK().getBlueJeansClient().getMeetingSession().isModerator()) {
             mWaitingRoomLayout = view.findViewById(R.id.llWaitingRoom);
@@ -229,10 +232,11 @@ public class MenuFragment extends BottomSheetDialogFragment {
             mSwitchWaitingRoom.setChecked(this.mIsWaitingRoomEnabled);
         }
 
-        if (isIscEnabled) {
+        if (isIscSelected) {
             mTvIscUseCase.setVisibility(View.VISIBLE);
             mMbIscUseCases.setVisibility(View.VISIBLE);
-            mMbIscStreamStyle.setEnabled(true);
+            mMbIscStreamStyle.setVisibility(View.VISIBLE);
+            mTvVideoStreamStyle.setVisibility(View.VISIBLE);
 
             mMbIscStreamStyle.setOnClickListener(view1 -> {
                 mIMenuCallback.showIscStreamStyleView();
@@ -246,7 +250,8 @@ public class MenuFragment extends BottomSheetDialogFragment {
         } else {
             mTvIscUseCase.setVisibility(View.GONE);
             mMbIscUseCases.setVisibility(View.GONE);
-            mMbIscStreamStyle.setEnabled(false);
+            mMbIscStreamStyle.setVisibility(View.GONE);
+            mTvVideoStreamStyle.setVisibility(View.GONE);
         }
 
         ObservableValueWithOptional<Boolean> closedCaptionFeatureObservable = SampleApplication.getBlueJeansSDK().getMeetingService()

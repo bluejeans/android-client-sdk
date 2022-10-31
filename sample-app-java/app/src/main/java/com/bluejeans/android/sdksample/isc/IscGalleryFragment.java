@@ -233,13 +233,17 @@ public class IscGalleryFragment extends Fragment {
     private void resetUI() {
         participantViewManagerMap.forEach((s, participantUIView) -> participantUIView.unbind());
         participantViewManagerMap.clear();
-        binding.stripContainer.removeAllViews();
+        if (binding != null) {
+            binding.stripContainer.removeAllViews();
+        }
         if (resolutionDisposable != null) resolutionDisposable.dispose();
-        binding.layoutMainStage.cnhAudioOnly.setVisibility(View.GONE);
-        binding.layoutMainStage.participantTextureView.setVisibility(View.GONE);
-        binding.layoutMainStage.tvParticipantName.setText("");
-        binding.layoutMainStage.tvParticipantResolution.setText("");
-        binding.layoutMainStage.tvPriority.setText("");
+        if (binding != null) {
+            binding.layoutMainStage.cnhAudioOnly.setVisibility(View.GONE);
+            binding.layoutMainStage.participantTextureView.setVisibility(View.GONE);
+            binding.layoutMainStage.tvParticipantName.setText("");
+            binding.layoutMainStage.tvParticipantResolution.setText("");
+            binding.layoutMainStage.tvPriority.setText("");
+        }
     }
 
     private void updateResolutionTextView(ObservableValueWithOptional<Size> videoResolution) {
