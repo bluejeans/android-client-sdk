@@ -9,96 +9,105 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/body"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <include
             android:id="@+id/layoutMainStage"
-            layout="@layout/isc_student_tile"
-            android:layout_width="0dp"
+            layout="@layout/isc_participant"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/scrollView"
             app:layout_constraintDimensionRatio="16:9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/scrollView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_marginTop="@dimen/_24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintRight_toLeftOf="parent"
+            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layoutMainStage">
 
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TableRow
-                    android:id="@+id/rowOne"
+                <TableLayout
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_marginBottom="@dimen/_8dp">
-                    <TextureView
-                        android:id="@+id/studentOne"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:layout_marginRight="@dimen/_2dp"
-                        android:elevation="1dp"
-                        android:layout_weight="1"/>
+                    android:layout_height="match_parent">
 
-                    <TextureView
-                        android:id="@+id/studentTwo"
+                    <TableRow
+                        android:id="@+id/rowOne"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        android:elevation="1dp"
-                        android:layout_weight="1" />
-                </TableRow>
+                        android:layout_marginBottom="@dimen/_8dp">
+                        <include
+                            android:id="@+id/studentOne"
+                            layout="@layout/isc_student_tile"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginRight="@dimen/_2dp"
+                            android:elevation="1dp"
+                            android:layout_weight="1"/>
+                        <include
+                            android:id="@+id/studentTwo"
+                            layout="@layout/isc_student_tile"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginRight="@dimen/_2dp"
+                            android:elevation="1dp"
+                            android:layout_weight="1" />
+                    </TableRow>
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_marginBottom="@dimen/_8dp">
-                    <TextureView
-                        android:id="@+id/studentThree"
+                    <TableRow
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        android:layout_marginRight="@dimen/_2dp"
-                        android:elevation="1dp"
-                        android:layout_weight="1"/>
+                        android:layout_marginBottom="@dimen/_8dp">
+                        <include
+                            android:id="@+id/studentThree"
+                            layout="@layout/isc_student_tile"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginRight="@dimen/_2dp"
+                            android:elevation="1dp"
+                            android:layout_weight="1" />
+                        <include
+                            android:id="@+id/studentFour"
+                            layout="@layout/isc_student_tile"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginRight="@dimen/_2dp"
+                            android:elevation="1dp"
+                            android:layout_weight="1" />
+                    </TableRow>
 
-                    <TextureView
-                        android:id="@+id/studentFour"
+                    <TableRow
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        android:elevation="1dp"
-                        android:layout_weight="1" />
-                </TableRow>
-
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_marginBottom="@dimen/_8dp">
-                    <TextureView
-                        android:id="@+id/studentFive"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:layout_marginRight="@dimen/_2dp"
-                        android:elevation="1dp"
-                        android:layout_weight="1"/>
-
-                    <TextureView
-                        android:id="@+id/studentSix"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:elevation="1dp"
-                        android:layout_weight="1" />
-                </TableRow>
-            </TableLayout>
-        </ScrollView>
+                        android:layout_marginBottom="@dimen/_8dp">
+                        <include
+                            android:id="@+id/studentFive"
+                            layout="@layout/isc_student_tile"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginRight="@dimen/_2dp"
+                            android:elevation="1dp"
+                            android:layout_weight="1" />
+                        <include
+                            android:id="@+id/studentSix"
+                            layout="@layout/isc_student_tile"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginRight="@dimen/_2dp"
+                            android:elevation="1dp"
+                            android:layout_weight="1" />
+                    </TableRow>
+                </TableLayout>
+        </androidx.core.widget.NestedScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

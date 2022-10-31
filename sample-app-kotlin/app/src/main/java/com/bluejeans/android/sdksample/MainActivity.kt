@@ -18,14 +18,8 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.CheckedTextView
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.SeekBar
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -50,12 +44,7 @@ import com.bluejeans.android.sdksample.utils.AudioDeviceHelper.Companion.getAudi
 import com.bluejeans.bluejeanssdk.devices.AudioDevice
 import com.bluejeans.bluejeanssdk.devices.VideoDevice
 import com.bluejeans.bluejeanssdk.logging.LoggingService
-import com.bluejeans.bluejeanssdk.meeting.ClosedCaptioningService
-import com.bluejeans.bluejeanssdk.meeting.ContentShareAvailability
-import com.bluejeans.bluejeanssdk.meeting.ContentShareEvent
-import com.bluejeans.bluejeanssdk.meeting.ContentShareState
-import com.bluejeans.bluejeanssdk.meeting.MeetingService
-import com.bluejeans.bluejeanssdk.meeting.WaitingRoomParticipantEvent
+import com.bluejeans.bluejeanssdk.meeting.*
 import com.bluejeans.bluejeanssdk.permission.PermissionService
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -204,7 +193,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
             R.id.ivMenuOption -> {
                 bottomSheetFragment?.let {
-                    it.isIscEnabled = binding.joinInfo.cbShowIsc.isChecked
                     it.show(supportFragmentManager, it.tag)
                 }
             }
@@ -468,8 +456,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         Timber.tag(TAG).i("endMeeting")
         isReconnecting = false
 
-        if (binding.selfView.selfView.visibility == View.GONE) {
-            binding.selfView.selfView.visibility = View.VISIBLE
+        if (binding.selfView.root.visibility == View.GONE) {
+            binding.selfView.root.visibility = View.VISIBLE
         }
 
         if (isInWaitingRoom) {
@@ -559,8 +547,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     bottomSheetFragment?.updateVideoLayout(videoLayoutName)
                     updateCurrentVideoLayoutForAlertDialog(videoLayoutName)
 
-                    if (binding.selfView.selfView.visibility == View.GONE) {
-                        binding.selfView.selfView.visibility = View.VISIBLE
+                    if (binding.selfView.root.visibility == View.GONE) {
+                        binding.selfView.root.visibility = View.VISIBLE
                     }
                 }
             }
@@ -846,7 +834,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding.ivUploadLogs.setOnClickListener(this)
 
         bottomSheetFragment = MenuFragment(
-            mIOptionMenuCallback, isWaitingRoomEnabled
+            mIOptionMenuCallback, isWaitingRoomEnabled, binding.joinInfo.cbShowIsc.isChecked
         )
         bottomSheetFragment?.updateVideoStreamStyle(resources.getStringArray(R.array.stream_styles)[0])
         participantListFragment = ParticipantListFragment()
@@ -1264,10 +1252,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             else -> throw IllegalArgumentException("Invalid video layout")
         }
 
-        if (binding.selfView.selfView.visibility == View.GONE) {
-            binding.selfView.selfView.visibility == View.VISIBLE
-        }
-
         if (binding.joinInfo.cbShowIsc.isChecked && (supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is IscGalleryFragment ||
                     supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is RemoteLearningFragment) ||
             supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is RemoteAssistFragment
@@ -1277,10 +1261,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         } else if (binding.joinInfo.cbShowIsc.isChecked && videoLayout is MeetingService.VideoLayout.Custom) {
             replaceInMeetingFragment(true)
+        } else if (!binding.joinInfo.cbShowIsc.isChecked && videoLayout is MeetingService.VideoLayout.Custom) {
+            showToastMessage(getString(R.string.no_individual_streams))
+            return
         }
 
         bottomSheetFragment?.updateVideoLayout(videoLayoutName)
         meetingService.setVideoLayout(videoLayout)
+        if (videoLayoutName != getString(R.string.custom_view) && binding.selfView.root.visibility == View.GONE) {
+            binding.selfView.root.visibility = View.VISIBLE
+        }
     }
 
     private fun selectAudioDevice(position: Int) {
@@ -1320,6 +1310,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun selectIscUseCase(position: Int) {
         iscUseCasesAdapter?.updateSelectedPosition(position)
+        meetingService.videoStreamService.setVideoStreamStyle(VideoStreamStyle.FIT_TO_VIEW)
+        iscStreamStyleAdapter?.updateSelectedPosition(0)
+        bottomSheetFragment?.updateVideoStreamStyle(resources.getStringArray(R.array.stream_styles)[0])
         when (position) {
             0 -> {
                 iscGalleryFragment?.onDestroy()
@@ -1329,7 +1322,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 iscGalleryFragment = IscGalleryFragment()
                 inMeetingFragment = InMeetingFragment()
                 remoteLearningFragment = RemoteLearningFragment()
-                binding.selfView.selfView.visibility = View.GONE
+                binding.selfView.root.visibility = View.GONE
                 val inMeetingFragment = remoteLearningFragment!!
                 supportFragmentManager.beginTransaction()
                     .replace(
@@ -1346,7 +1339,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 iscGalleryFragment = IscGalleryFragment()
                 inMeetingFragment = InMeetingFragment()
                 remoteAssistFragment = RemoteAssistFragment()
-                binding.selfView.selfView.visibility = View.GONE
+                binding.selfView.root.visibility = View.GONE
                 val inMeetingFragment = remoteAssistFragment!!
                 supportFragmentManager.beginTransaction()
                     .replace(

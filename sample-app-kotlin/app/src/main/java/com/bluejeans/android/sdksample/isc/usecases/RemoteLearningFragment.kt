@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -47,12 +48,12 @@ class RemoteLearningFragment : Fragment() {
 
         studentTextureViews.addAll(
             listOf(
-                binding.studentOne,
-                binding.studentTwo,
-                binding.studentThree,
-                binding.studentFour,
-                binding.studentFive,
-                binding.studentSix
+                binding.studentOne.participantTextureView,
+                binding.studentTwo.participantTextureView,
+                binding.studentThree.participantTextureView,
+                binding.studentFour.participantTextureView,
+                binding.studentFive.participantTextureView,
+                binding.studentSix.participantTextureView
             )
         )
 
@@ -143,6 +144,13 @@ class RemoteLearningFragment : Fragment() {
             if (it.isVideo) {
                 studentTextureViews[index].visibility = View.VISIBLE
                 attachStudentStream(it, studentTextureViews[index])
+                if (it.width != null && it.height != null) {
+                    setStudentTextureViewConstraints(
+                        it.width,
+                        it.height,
+                        studentTextureViews[index]
+                    )
+                }
             }
         }
     }
@@ -189,6 +197,37 @@ class RemoteLearningFragment : Fragment() {
     private fun configurePortraitView() {
         binding.scrollView.visibility = View.VISIBLE
         setModeratorTextureViewConstraints()
+    }
+
+    private fun setStudentTextureViewConstraints(
+        videoWidth: Int,
+        videoHeight: Int,
+        textureView: TextureView
+    ) {
+        val set = ConstraintSet()
+        set.clone(binding.layoutMainStage.root)
+        set.connect(
+            textureView.id,
+            ConstraintSet.RIGHT,
+            ConstraintSet.PARENT_ID,
+            ConstraintSet.RIGHT
+        )
+        set.connect(textureView.id, ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT)
+        set.connect(
+            textureView.id,
+            ConstraintSet.BOTTOM,
+            ConstraintSet.PARENT_ID,
+            ConstraintSet.BOTTOM
+        )
+        set.connect(textureView.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
+        if (moderator != null) {
+            if (videoWidth > 0 && videoHeight > 0) {
+                val ratio = videoWidth.toFloat() / videoHeight
+                Log.i(TAG, "Ratio: $ratio")
+                set.setDimensionRatio(textureView.id, ratio.toString())
+            }
+        }
+        set.applyTo(textureView.parent as ConstraintLayout)
     }
 
     companion object {
