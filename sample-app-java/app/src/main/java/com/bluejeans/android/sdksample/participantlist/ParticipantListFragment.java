@@ -271,7 +271,7 @@ public class ParticipantListFragment extends Fragment implements ParticipantChat
             }
             countDisposable = new CompositeDisposable();
             ObservableValue<Integer> countObserver;
-            countObserver = ObservableComputed.Companion.create(publicChatService.getUnreadMessagesCount(), privateChatService.getUnreadMessagesCount(), true, (integer, integer2) -> {
+            countObserver = ObservableComputed.Companion.create(publicChatService.getUnreadMessagesCount(), privateChatService.getUnreadMessagesCount(), new CompositeDisposable(),true, (integer, integer2) -> {
                 if (integer.getValue() == null && integer2.getValue() == null) return 0;
                 else if (integer.getValue() != null && integer2.getValue() == null)
                     return integer.getValue();
