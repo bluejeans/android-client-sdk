@@ -160,3 +160,20 @@ See the updated [License.md](LICENSE.md)
 - Create custom layouts and set the VideoLayout to `Custom`
 - Request specific streams of video with different configurations of your choice using the `VideoStreamService`
 - Render videos with different styles in your own custom sized views with `attachParticipantStreamToView`
+
+Version 1.7.0 *(05-2023)*
+---------------------------------
+Features / Changes:
+### 🚨 ***Breaking Changes*** 
+
+- New input parameter `appPartner` added to the BluejeansSDK constructor. We recommend you to share your integrator partner name through this parameter
+
+### New License
+See the updated [License.md](LICENSE.md)
+
+### Features
+#### Custom video source
+- The Custom Video Source feature allows developers to integrate a variety of video frames, including pre-recorded clips, 3D renders, or a blend of both, as part of user input video, offering endless possibilities for video customization.
+
+- Target OS level 13
+- Misc bug fixes
