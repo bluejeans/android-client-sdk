@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>ModeratorControlsService</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../index.html">
+                    <span>BlueJeans Android Client SDK : v1.7.0</span>
+            </a>
+    </div>
+    <div>
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageIds="BlueJeans Android Client SDK : v1.7.0::com.bluejeans.bluejeanssdk.moderator/ModeratorControlsService///PointingToDeclaration//-1887420133">
+  <div class="breadcrumbs"><a href="../../../index.html">BlueJeans Android Client SDK : v1.7.0</a><span class="delimiter">/</span><a href="../index.html">com.bluejeans.bluejeanssdk.moderator</a><span class="delimiter">/</span><span class="current">ModeratorControlsService</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Moderator</span><wbr></wbr><span>Controls</span><wbr></wbr><span><span>Service</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">ModeratorControlsService</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">blueJeansClient<span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore/BlueJeansClient///PointingToDeclaration/">BlueJeansClient</span><span class="token punctuation">, </span></span><span class="parameter ">bjnScheduler<span class="token operator">: </span><span data-unresolved-link="com.bluejeans.rxextensions.utils/BjnScheduler///PointingToDeclaration/">BjnScheduler</span></span></span><span class="token punctuation">)</span></div><p class="paragraph">This service is used to perform moderator-only actions as listed below: </br></p><ol><li><p class="paragraph">Mute/Unmute other participants </br></p></li><li><p class="paragraph">Mute/Unmute everyone else in the meeting </br></p></li><li><p class="paragraph">Remove a participant from the meeting </br></p></li><li><p class="paragraph">Start/Stop recording </br></p></li><li><p class="paragraph">End meeting after x seconds </br></p></li><li><p class="paragraph">Spotlight a video participant</p></li></ol></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section-body">
+      <h2 class="tabbedcontent">Constructors</h2>
+      <div class="table" data-togglable="Constructors"><a data-name="1025747973%2FConstructors%2F-1887420133" anchor-label="ModeratorControlsService" id="1025747973%2FConstructors%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue TabbedContent">
+            <div class=""><span class="inline-flex">
+                <div><a href="-moderator-controls-service.html"><span>Moderator</span><wbr></wbr><span>Controls</span><wbr></wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1025747973%2FConstructors%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-moderator-controls-service.html"><span class="token function">ModeratorControlsService</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">blueJeansClient<span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore/BlueJeansClient///PointingToDeclaration/">BlueJeansClient</span><span class="token punctuation">, </span></span><span class="parameter ">bjnScheduler<span class="token operator">: </span><span data-unresolved-link="com.bluejeans.rxextensions.utils/BjnScheduler///PointingToDeclaration/">BjnScheduler</span></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="683813165%2FClasslikes%2F-1887420133" anchor-label="RecordingSpace" id="683813165%2FClasslikes%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-recording-space/index.html"><span>Recording</span><wbr></wbr><span><span>Space</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="683813165%2FClasslikes%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-recording-space/index.html">RecordingSpace</a></div><div class="brief "><p class="paragraph">Provides for the recording space available.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1671178238%2FClasslikes%2F-1887420133" anchor-label="RecordingState" id="-1671178238%2FClasslikes%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-recording-state/index.html"><span>Recording</span><wbr></wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1671178238%2FClasslikes%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">class </span><a href="-recording-state/index.html">RecordingState</a></div><div class="brief "><p class="paragraph">Provides for recording state i.e. started or stopped.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Properties</h2>
+      <div class="table" data-togglable="Properties"><a data-name="-1494047819%2FProperties%2F-1887420133" anchor-label="isModeratorControlsAvailable" id="-1494047819%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="is-moderator-controls-available.html"><span>is</span><wbr></wbr><span>Moderator</span><wbr></wbr><span>Controls</span><wbr></wbr><span><span>Available</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1494047819%2FProperties%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><a data-name="-1494047819%2FProperties%2F-1887420133" anchor-label="isModeratorControlsAvailable" id="-1494047819%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="is-moderator-controls-available.html">isModeratorControlsAvailable</a><span class="token operator">: </span><span data-unresolved-link="com.bluejeans.rxextensions/ObservableValueWithOptional///PointingToDeclaration/">ObservableValueWithOptional</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><a data-name="-1494047819%2FProperties%2F-1887420133" anchor-label="isModeratorControlsAvailable" id="-1494047819%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a><p class="paragraph">Observable that provides for moderator controls are available or not </br> true -> if moderator </br> false -> if not a moderator </br> null -> meeting not started</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-1867173741%2FProperties%2F-1887420133" anchor-label="isRecordingFeatureAvailable" id="-1867173741%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="is-recording-feature-available.html"><span>is</span><wbr></wbr><span>Recording</span><wbr></wbr><span>Feature</span><wbr></wbr><span><span>Available</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1867173741%2FProperties%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><a data-name="-1867173741%2FProperties%2F-1887420133" anchor-label="isRecordingFeatureAvailable" id="-1867173741%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="is-recording-feature-available.html">isRecordingFeatureAvailable</a><span class="token operator">: </span><span data-unresolved-link="com.bluejeans.rxextensions/ObservableValueWithOptional///PointingToDeclaration/">ObservableValueWithOptional</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">&gt;</span></div><div class="brief "><a data-name="-1867173741%2FProperties%2F-1887420133" anchor-label="isRecordingFeatureAvailable" id="-1867173741%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a><p class="paragraph">Observable that provides about recording feature is available for the meeting. </br> This will be true only if meeting is joined as moderator and the meeting supports the recording feature</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1133379213%2FProperties%2F-1887420133" anchor-label="recordingState" id="1133379213%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="recording-state.html"><span>recording</span><wbr></wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1133379213%2FProperties%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><a data-name="1133379213%2FProperties%2F-1887420133" anchor-label="recordingState" id="1133379213%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="recording-state.html">recordingState</a><span class="token operator">: </span><span data-unresolved-link="com.bluejeans.rxextensions/ObservableValueWithOptional///PointingToDeclaration/">ObservableValueWithOptional</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-recording-state/index.html">ModeratorControlsService.RecordingState</a><span class="token operator">&gt;</span></div><div class="brief "><a data-name="1133379213%2FProperties%2F-1887420133" anchor-label="recordingState" id="1133379213%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a><p class="paragraph">Observable that provides current recordingState </br> <a href="-recording-state/-started/index.html">RecordingState.Started</a> -> recording on </br> <a href="-recording-state/-stopped/index.html">RecordingState.Stopped</a> -> recording off </br> null -> meeting not started</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="-80144468%2FFunctions%2F-1887420133" anchor-label="checkSpaceAvailabilityForRecording" id="-80144468%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="check-space-availability-for-recording.html"><span>check</span><wbr></wbr><span>Space</span><wbr></wbr><span>Availability</span><wbr></wbr><span>For</span><wbr></wbr><span><span>Recording</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-80144468%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="check-space-availability-for-recording.html"><span class="token function">checkSpaceAvailabilityForRecording</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="io.reactivex.rxjava3.core/Single///PointingToDeclaration/">Single</span><span class="token operator">&lt;</span><span class="token keyword"></span><a href="-recording-space/index.html">ModeratorControlsService.RecordingSpace</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Checks recording usage for the user's account. </br> <b> Be Advised: Calling <a href="check-space-availability-for-recording.html">checkSpaceAvailabilityForRecording</a> as a participant instead of a moderator throws an exception stating <q>Moderator controls are not available</q>. </b></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="847327812%2FFunctions%2F-1887420133" anchor-label="endMeetingForAllParticipants" id="847327812%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="end-meeting-for-all-participants.html"><span>end</span><wbr></wbr><span>Meeting</span><wbr></wbr><span>For</span><wbr></wbr><span>All</span><wbr></wbr><span><span>Participants</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="847327812%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="end-meeting-for-all-participants.html"><span class="token function">endMeetingForAllParticipants</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">timeInSeconds<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Ends the current meeting there by removing all the participants of the meeting, after a provided delay duration. Note that this will end the meeting for the moderator immediately. If you wish to just end the meeting for yourself without ending the meeting for everyone, use MeetingService endMeeting </br></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1707162098%2FFunctions%2F-1887420133" anchor-label="removeParticipant" id="1707162098%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="remove-participant.html"><span>remove</span><wbr></wbr><span><span>Participant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1707162098%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="remove-participant.html"><span class="token function">removeParticipant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">participant<span class="token operator">: </span><a href="../../com.bluejeans.bluejeanssdk.meeting/-participants-service/-participant/index.html">ParticipantsService.Participant</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Remove the given participant from the meeting </br></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="626571779%2FFunctions%2F-1887420133" anchor-label="setAudioMutedForAllParticipants" id="626571779%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="set-audio-muted-for-all-participants.html"><span>set</span><wbr></wbr><span>Audio</span><wbr></wbr><span>Muted</span><wbr></wbr><span>For</span><wbr></wbr><span>All</span><wbr></wbr><span><span>Participants</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="626571779%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="set-audio-muted-for-all-participants.html"><span class="token function">setAudioMutedForAllParticipants</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">muted<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets audio mute state for all the participants </br></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="437649026%2FFunctions%2F-1887420133" anchor-label="setAudioMutedForParticipant" id="437649026%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="set-audio-muted-for-participant.html"><span>set</span><wbr></wbr><span>Audio</span><wbr></wbr><span>Muted</span><wbr></wbr><span>For</span><wbr></wbr><span><span>Participant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="437649026%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="set-audio-muted-for-participant.html"><span class="token function">setAudioMutedForParticipant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">muted<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">participant<span class="token operator">: </span><a href="../../com.bluejeans.bluejeanssdk.meeting/-participants-service/-participant/index.html">ParticipantsService.Participant</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets audio mute for a participant </br></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="947482600%2FFunctions%2F-1887420133" anchor-label="setVideoMutedForAllParticipants" id="947482600%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="set-video-muted-for-all-participants.html"><span>set</span><wbr></wbr><span>Video</span><wbr></wbr><span>Muted</span><wbr></wbr><span>For</span><wbr></wbr><span>All</span><wbr></wbr><span><span>Participants</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="947482600%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="set-video-muted-for-all-participants.html"><span class="token function">setVideoMutedForAllParticipants</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">muted<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets video mute state for all the participants </br></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-948232195%2FFunctions%2F-1887420133" anchor-label="setVideoMutedForParticipant" id="-948232195%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="set-video-muted-for-participant.html"><span>set</span><wbr></wbr><span>Video</span><wbr></wbr><span>Muted</span><wbr></wbr><span>For</span><wbr></wbr><span><span>Participant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-948232195%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="set-video-muted-for-participant.html"><span class="token function">setVideoMutedForParticipant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">muted<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">participant<span class="token operator">: </span><a href="../../com.bluejeans.bluejeanssdk.meeting/-participants-service/-participant/index.html">ParticipantsService.Participant</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets video mute for a participant </br></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-685962371%2FFunctions%2F-1887420133" anchor-label="spotlightParticipantVideo" id="-685962371%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="spotlight-participant-video.html"><span>spotlight</span><wbr></wbr><span>Participant</span><wbr></wbr><span><span>Video</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-685962371%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="spotlight-participant-video.html"><span class="token function">spotlightParticipantVideo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enable<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">participant<span class="token operator">: </span><a href="../../com.bluejeans.bluejeanssdk.meeting/-participants-service/-participant/index.html">ParticipantsService.Participant</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Turn spotlight for a meeting's video participant. This feature is also referred to as &quot;moderator pinning&quot;</br> Whenever a spotlight for a participant &quot;X&quot; is turned on by a moderator, people layout would be pushed to all the participants and the video of &quot;X&quot; will take the main stage irrespective of whoever is the dominant speaker. This can be used to spotlight self or any other video participant in the meeting. Spotlight is applicable only for video participants and not for audio only participants.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="-10655010%2FFunctions%2F-1887420133" anchor-label="startRecording" id="-10655010%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="start-recording.html"><span>start</span><wbr></wbr><span><span>Recording</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-10655010%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="start-recording.html"><span class="token function">startRecording</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Start meeting recording. </br> This method makes the request to the server to start recording. </br> Recording link will be shared over the email associated with the user's account. </br> and is slightly time consuming, may take at most 10 seconds.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="736432286%2FFunctions%2F-1887420133" anchor-label="stopRecording" id="736432286%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="stop-recording.html"><span>stop</span><wbr></wbr><span><span>Recording</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="736432286%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="stop-recording.html"><span class="token function">stopRecording</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Stop recording. </br> <b>Be Advised: Calling <a href="stop-recording.html">stopRecording</a> before <a href="recording-state.html">recordingState</a> transitions to <a href="-recording-state/-started/index.html">RecordingState.Started</a> causes the call to be ignored.</b></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>

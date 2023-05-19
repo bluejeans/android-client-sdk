@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>CustomVideoSourceService</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="../../../index.html">
+                    <span>BlueJeans Android Client SDK : v1.7.0</span>
+            </a>
+    </div>
+    <div>
+    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageIds="BlueJeans Android Client SDK : v1.7.0::com.bluejeans.bluejeanssdk.customvideo/CustomVideoSourceService///PointingToDeclaration//-1887420133">
+  <div class="breadcrumbs"><a href="../../../index.html">BlueJeans Android Client SDK : v1.7.0</a><span class="delimiter">/</span><a href="../index.html">com.bluejeans.bluejeanssdk.customvideo</a><span class="delimiter">/</span><span class="current">CustomVideoSourceService</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Custom</span><wbr></wbr><span>Video</span><wbr></wbr><span>Source</span><wbr></wbr><span><span>Service</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">CustomVideoSourceService</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">analyticsManager<span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore.analytics/AnalyticsManager///PointingToDeclaration/">AnalyticsManager</span><span class="token punctuation">, </span></span><span class="parameter ">blueJeansClient<span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore/BlueJeansClient///PointingToDeclaration/">BlueJeansClient</span></span></span><span class="token punctuation">)</span></div><p class="paragraph">This service class offers support for custom video.</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="Types">Types</button><button class="section-tab" data-togglable="Constructors">Constructors</button><button class="section-tab" data-togglable="Functions">Functions</button><button class="section-tab" data-togglable="Properties">Properties</button></div>
+    <div class="tabs-section-body">
+      <h2 class="tabbedcontent">Constructors</h2>
+      <div class="table" data-togglable="Constructors"><a data-name="-1436677274%2FConstructors%2F-1887420133" anchor-label="CustomVideoSourceService" id="-1436677274%2FConstructors%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue TabbedContent">
+            <div class=""><span class="inline-flex">
+                <div><a href="-custom-video-source-service.html"><span>Custom</span><wbr></wbr><span>Video</span><wbr></wbr><span>Source</span><wbr></wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1436677274%2FConstructors%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="-custom-video-source-service.html"><span class="token function">CustomVideoSourceService</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">analyticsManager<span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore.analytics/AnalyticsManager///PointingToDeclaration/">AnalyticsManager</span><span class="token punctuation">, </span></span><span class="parameter ">blueJeansClient<span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore/BlueJeansClient///PointingToDeclaration/">BlueJeansClient</span></span></span><span class="token punctuation">)</span></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Types</h2>
+      <div class="table" data-togglable="Types"><a data-name="-41725981%2FClasslikes%2F-1887420133" anchor-label="Companion" id="-41725981%2FClasslikes%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-41725981%2FClasslikes%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Properties</h2>
+      <div class="table" data-togglable="Properties"><a data-name="-1183306463%2FProperties%2F-1887420133" anchor-label="currentVideoSource" id="-1183306463%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="current-video-source.html"><span>current</span><wbr></wbr><span>Video</span><wbr></wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1183306463%2FProperties%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted" data-togglable="Properties"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><a data-name="-1183306463%2FProperties%2F-1887420133" anchor-label="currentVideoSource" id="-1183306463%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">val </span><a href="current-video-source.html">currentVideoSource</a><span class="token operator">: </span><span data-unresolved-link="com.bluejeans.rxextensions/ObservableValue///PointingToDeclaration/">ObservableValue</span><span class="token operator">&lt;</span><span class="token keyword"></span><span data-unresolved-link="com.bjnclientcore.media/VideoSource///PointingToDeclaration/">VideoSource</span><span class="token operator">&gt;</span></div><div class="brief "><a data-name="-1183306463%2FProperties%2F-1887420133" anchor-label="currentVideoSource" id="-1183306463%2FProperties%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a><p class="paragraph"><span data-unresolved-link="com.bluejeans.rxextensions/ObservableValue///PointingToDeclaration/">ObservableValue</span> that indicates the current <span data-unresolved-link="com.bjnclientcore.media/VideoSource///PointingToDeclaration/">VideoSource</span></p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="">Functions</h2>
+      <div class="table" data-togglable="Functions"><a data-name="-1275314786%2FFunctions%2F-1887420133" anchor-label="pushCustomVideoFrame" id="-1275314786%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="push-custom-video-frame.html"><span>push</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Video</span><wbr></wbr><span><span>Frame</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1275314786%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="push-custom-video-frame.html"><span class="token function">pushCustomVideoFrame</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">frame<span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore.media/BJNVideoFrame///PointingToDeclaration/">BJNVideoFrame</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore.media/PushVideoFrameResult///PointingToDeclaration/">PushVideoFrameResult</span></div><div class="brief "><p class="paragraph">Sends a custom video frame.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+<a data-name="1334068823%2FFunctions%2F-1887420133" anchor-label="setVideoSource" id="1334068823%2FFunctions%2F-1887420133" data-filterable-set=":library:dokkaHtml/release"></a>
+        <div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release">
+          <div class="main-subrow keyValue ">
+            <div class=""><span class="inline-flex">
+                <div><a href="set-video-source.html"><span>set</span><wbr></wbr><span>Video</span><wbr></wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1334068823%2FFunctions%2F-1887420133"></span>
+                  <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                </span></span></div>
+            <div>
+              <div class="title">
+                <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="set-video-source.html"><span class="token function">setVideoSource</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">videoSource<span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore.media/VideoSource///PointingToDeclaration/">VideoSource</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Changes the <span data-unresolved-link="com.bjnclientcore.media/VideoSource///PointingToDeclaration/">VideoSource</span> to the one specified.</p></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>
