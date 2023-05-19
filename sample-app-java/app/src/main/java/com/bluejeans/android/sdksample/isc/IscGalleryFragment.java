@@ -85,9 +85,9 @@ public class IscGalleryFragment extends Fragment {
                     streamConfiguration.add(
                             new VideoStreamConfiguration(
                                     p.getSeamGuid(),
-                                    participantsConfigMap.containsValue(p.getSeamGuid()) ?
+                                    participantsConfigMap.containsKey(p.getSeamGuid()) ?
                                             participantsConfigMap.get(p.getSeamGuid()).getStreamQuality() : StreamQuality.R360p_30fps,
-                                    participantsConfigMap.containsValue(p.getSeamGuid()) ?
+                                    participantsConfigMap.containsKey(p.getSeamGuid()) ?
                                             participantsConfigMap.get(p.getSeamGuid()).getStreamPriority() : StreamPriority.Medium
                             )
                     );

@@ -28,6 +28,7 @@ class RemoteLearningFragment : Fragment() {
     private var moderator: RemoteLearningParticipant? = null
     private val students = mutableListOf<RemoteLearningParticipant>()
     private val studentTextureViews = mutableListOf<TextureView>()
+    private val textureViewToAspectRatioMap = mutableMapOf<Int, Float>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +59,12 @@ class RemoteLearningFragment : Fragment() {
         )
 
         viewModel.participantsObservable.observe(viewLifecycleOwner) { studentsList ->
+            if (studentsList.isEmpty()) {
+                toggleModeratorUIVisibility(true)
+                textureViewToAspectRatioMap.clear()
+                return@observe
+            }
+
             studentTextureViews.forEach {
                 it.visibility = View.GONE
             }
@@ -103,6 +110,7 @@ class RemoteLearningFragment : Fragment() {
         students.forEach {
             viewModel.detachParticipantFromView(it.participantId)
         }
+        textureViewToAspectRatioMap.clear()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -114,6 +122,8 @@ class RemoteLearningFragment : Fragment() {
 
     private fun updateModeratorUI() {
         moderator?.let {
+            toggleModeratorUIVisibility(false)
+
             binding.layoutMainStage.tvParticipantName.text = it.name
 
             if (!it.isVideo) {
@@ -204,30 +214,27 @@ class RemoteLearningFragment : Fragment() {
         videoHeight: Int,
         textureView: TextureView
     ) {
-        val set = ConstraintSet()
-        set.clone(binding.layoutMainStage.root)
-        set.connect(
-            textureView.id,
-            ConstraintSet.RIGHT,
-            ConstraintSet.PARENT_ID,
-            ConstraintSet.RIGHT
-        )
-        set.connect(textureView.id, ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT)
-        set.connect(
-            textureView.id,
-            ConstraintSet.BOTTOM,
-            ConstraintSet.PARENT_ID,
-            ConstraintSet.BOTTOM
-        )
-        set.connect(textureView.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-        if (moderator != null) {
-            if (videoWidth > 0 && videoHeight > 0) {
-                val ratio = videoWidth.toFloat() / videoHeight
+        if (videoWidth > 0 && videoHeight > 0) {
+            val ratio = videoWidth.toFloat() / videoHeight
+            if (textureViewToAspectRatioMap[textureView.id] != ratio) {
                 Log.i(TAG, "Ratio: $ratio")
+                val set = ConstraintSet()
+                set.clone(binding.layoutMainStage.root)
                 set.setDimensionRatio(textureView.id, ratio.toString())
+                set.applyTo(textureView.parent as ConstraintLayout)
+                textureViewToAspectRatioMap[textureView.id] = ratio
             }
         }
-        set.applyTo(textureView.parent as ConstraintLayout)
+    }
+
+    private fun toggleModeratorUIVisibility(isHidden: Boolean) {
+        if (isHidden) {
+            binding.layoutMainStage.cnhAudioOnly.visibility = View.GONE
+            binding.layoutMainStage.participantTextureView.visibility = View.GONE
+            binding.layoutMainStage.tvParticipantName.visibility = View.GONE
+        } else {
+            binding.layoutMainStage.tvParticipantName.visibility = View.VISIBLE
+        }
     }
 
     companion object {

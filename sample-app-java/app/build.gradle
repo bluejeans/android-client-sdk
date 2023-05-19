@@ -3,16 +3,16 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.bluejeans.android.sdksample"
         minSdkVersion 26
-        targetSdkVersion 32
-        versionCode 16
+        targetSdkVersion 33
+        versionCode 17
         multiDexEnabled true
-        versionName "1.6.0"
+        versionName "1.7.0"
     }
 
     buildTypes {
@@ -46,9 +46,15 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 
+    implementation 'com.google.ar:core:1.35.0'
+
+    // Obj - a simple Wavefront OBJ file loader
+    // https://github.com/javagl/Obj
+    implementation 'de.javagl:obj:0.2.1'
+
     //Rx Android
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
 
     //BlueJeans Android Client SDK
-    implementation "com.bluejeans:android-client-sdk:1.6.0"
+    implementation "com.bluejeans:android-client-sdk:1.7.0"
 }

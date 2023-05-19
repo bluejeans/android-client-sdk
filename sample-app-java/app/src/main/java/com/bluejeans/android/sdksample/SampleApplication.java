@@ -26,7 +26,7 @@ public class SampleApplication extends Application {
 
     private void initSDK() {
         try {
-            blueJeansSDK = new BlueJeansSDK(new BlueJeansSDKInitParams(this));
+            blueJeansSDK = new BlueJeansSDK(new BlueJeansSDKInitParams(this), null);
         } catch (Exception ex) {
             Log.e(TAG, "Exception while initiating sdk " + ex.getMessage());
         }

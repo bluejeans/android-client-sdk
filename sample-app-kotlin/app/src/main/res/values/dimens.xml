@@ -16,6 +16,7 @@
     <dimen name="_10sp">10sp</dimen>
     <dimen name="_6sp">6sp</dimen>
 
+
     <!--Chat -->
     <dimen name="chat_bubble_max_width">270dp</dimen>
     <dimen name="_4dp">4dp</dimen>

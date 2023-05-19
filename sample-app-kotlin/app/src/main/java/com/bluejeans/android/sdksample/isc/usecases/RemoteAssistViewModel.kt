@@ -69,6 +69,7 @@ class RemoteAssistViewModel : ViewModel() {
         ObservableComputed.create(
             bjnParticipantMap,
             videoStreamService.videoStreams,
+            compositeDisposable,
             distinctUntilChanged = false
         ) { rosterParticipants, videoStream ->
             val videoParticipants = mutableListOf<ParticipantUI>()

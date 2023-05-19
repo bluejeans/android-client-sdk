@@ -35,6 +35,7 @@ class MenuFragment(
     private var currentIscUseCase = ""
     private var closedCaptionState = false
     private var hdCaptureState = false
+    private var isCustomVideo = false
     private var menuFragmentBinding: FragmentOptionMenuDialogBinding? = null
     private var bottomSheetBehavior: BottomSheetBehavior<View>? = null
 
@@ -51,6 +52,7 @@ class MenuFragment(
         fun handleHDReceiveSwitchEvent(isChecked: Boolean)
         fun showWaitingRoom()
         fun setWaitingRoomEnabled(enabled: Boolean)
+        fun setCustomVideoSource(isCustom: Boolean)
     }
 
     override fun onStart() {
@@ -163,6 +165,10 @@ class MenuFragment(
         menuFragmentBinding?.swHDCapture?.isChecked = hdCaptureState
     }
 
+    fun updateCustomVideoSwitchState(isCustomVideo: Boolean) {
+        this.isCustomVideo = isCustomVideo
+    }
+
     private fun initViews() {
         menuFragmentBinding?.mbVideoLayout?.setOnClickListener {
             menuCallBack.showVideoLayoutView(menuFragmentBinding!!.mbVideoLayout.text as String)
@@ -249,6 +255,11 @@ class MenuFragment(
                 menuFragmentBinding?.btnShowWaitingRoom?.isEnabled = false
                 menuFragmentBinding?.swWaitingRoom?.isEnabled = false
             }
+        }
+
+        menuFragmentBinding?.swCustomVideo?.isChecked = isCustomVideo
+        menuFragmentBinding?.swCustomVideo?.setOnCheckedChangeListener { _, isChecked ->
+            menuCallBack.setCustomVideoSource(isChecked)
         }
 
         updateView()

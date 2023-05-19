@@ -147,6 +147,7 @@ class ParticipantListFragment : BottomSheetDialogFragment(), ParticipantChatItem
             val countObserver: ObservableValue<Int> =
                 ObservableComputed.create(publicChatService!!.unreadMessagesCount,
                     privateChatService!!.unreadMessagesCount,
+                    countDisposable,
                     true,
                     calculator =
                     { integer: Optional<Int>, integer2: Optional<Int> ->

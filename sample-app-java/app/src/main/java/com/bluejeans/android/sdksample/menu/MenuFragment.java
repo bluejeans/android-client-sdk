@@ -39,8 +39,9 @@ public class MenuFragment extends BottomSheetDialogFragment {
     private boolean mClosedCaptionState = false;
     private boolean mHDCaptureState = false;
     private boolean mHDReceiveState = false;
+    private boolean mCustomVideoState = false;
     private boolean isIscSelected = false;
-    private SwitchCompat mSwitchClosedCaption, mSwitchWaitingRoom, mSwitchHDCapture, mSwitch720Receive;
+    private SwitchCompat mSwitchClosedCaption, mSwitchWaitingRoom, mSwitchHDCapture, mSwitch720Receive, mSwitchCustomVideo;
     private TextView mTvIscUseCase, mTvVideoStreamStyle;
     private LinearLayout mWaitingRoomLayout;
 
@@ -68,6 +69,8 @@ public class MenuFragment extends BottomSheetDialogFragment {
         void showWaitingRoom();
 
         void setWaitingRoomEnabled(boolean enabled);
+
+        void setCustomVideoSource(boolean isCustom);
     }
 
     public MenuFragment(IMenuCallback iMenuCallback, boolean isWaitingRoomEnabled, boolean isIscSelected) {
@@ -161,6 +164,10 @@ public class MenuFragment extends BottomSheetDialogFragment {
         mClosedCaptionState = isClosedCaptionActive;
     }
 
+    public void updateCustomVideoSwitchState(boolean isCustomVideo) {
+        mCustomVideoState = isCustomVideo;
+    }
+
     public void updateHDCaptureState(boolean captureHD) {
         mHDCaptureState = captureHD;
         mSwitchHDCapture.setChecked(mHDCaptureState);
@@ -173,12 +180,14 @@ public class MenuFragment extends BottomSheetDialogFragment {
         mSwitchClosedCaption = view.findViewById(R.id.swClosedCaption);
         mSwitchHDCapture = view.findViewById(R.id.swHDCapture);
         mSwitch720Receive = view.findViewById(R.id.swHDReceive);
+        mSwitchCustomVideo = view.findViewById(R.id.swCustomVideo);
         mMbIscStreamStyle = view.findViewById(R.id.mbVideoStreamStyle);
         mMbIscUseCases = view.findViewById(R.id.mbIscUseCases);
         mTvIscUseCase = view.findViewById(R.id.tvIscUseCases);
         mTvVideoStreamStyle = view.findViewById(R.id.tvStreamStyle);
 
-        if (SampleApplication.getBlueJeansSDK().getBlueJeansClient().getMeetingSession().isModerator()) {
+        if (SampleApplication.getBlueJeansSDK().getBlueJeansClient().getMeetingSession() != null &&
+                SampleApplication.getBlueJeansSDK().getBlueJeansClient().getMeetingSession().isModerator()) {
             mWaitingRoomLayout = view.findViewById(R.id.llWaitingRoom);
             mWaitingRoomLayout.setVisibility(View.VISIBLE);
 
@@ -278,12 +287,19 @@ public class MenuFragment extends BottomSheetDialogFragment {
             }
         });
 
-        mHDReceiveState = SampleApplication.getBlueJeansSDK().getVideoDeviceService().is720pVideoReceiveEnabled().getValue();
-        mSwitch720Receive.setChecked(mHDReceiveState);
+        if (SampleApplication.getBlueJeansSDK().getVideoDeviceService().is720pVideoReceiveEnabled().getValue() != null) {
+            mHDReceiveState = SampleApplication.getBlueJeansSDK().getVideoDeviceService().is720pVideoReceiveEnabled().getValue();
+            mSwitch720Receive.setChecked(mHDReceiveState);
+        }
         mSwitch720Receive.setOnCheckedChangeListener(((buttonView, isChecked) -> {
             if (buttonView.isPressed()) {
                 mIMenuCallback.handleHDReceiveSwitchEvent(isChecked);
             }
+        }));
+
+        mSwitchCustomVideo.setChecked(mCustomVideoState);
+        mSwitchCustomVideo.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+            mIMenuCallback.setCustomVideoSource(isChecked);
         }));
         updateView();
     }

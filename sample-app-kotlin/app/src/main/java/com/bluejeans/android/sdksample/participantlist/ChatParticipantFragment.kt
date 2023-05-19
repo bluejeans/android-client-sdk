@@ -182,8 +182,9 @@ class ChatParticipantFragment private constructor() : Fragment() {
     private fun subscribePrivateChatHistory() {
         disposable?.add(privateChatService?.chatHistoryByParticipant?.subscribeOnUI(
             { map: Map<ParticipantsService.Participant, ObservableValue<ArrayList<ChatMessage>>>? ->
-                if (map != null && map.containsKey(remoteParticipant)) {
-                    disposable?.add(map[remoteParticipant]?.subscribeOnUI(
+                val participant = map?.entries?.find { entry -> entry.key.id == remoteParticipant.id }
+                if (map != null && participant != null) {
+                    disposable?.add(participant.value?.subscribeOnUI(
                         { msgsList: ArrayList<ChatMessage> ->
                             if (adapter != null) {
                                 adapter?.updateMessages(msgsList)

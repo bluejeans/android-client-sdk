@@ -161,6 +161,15 @@
             app:layout_constraintStart_toEndOf="@+id/swHDCapture"
             app:layout_constraintTop_toBottomOf="@id/swHDReceive" />
 
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/swCustomVideo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/custom_video"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/swClosedCaption" />
+
         <LinearLayout
             android:id="@+id/llWaitingRoom"
             android:layout_width="match_parent"
@@ -171,7 +180,7 @@
             android:visibility="gone"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/swHDCapture">
+            app:layout_constraintTop_toBottomOf="@id/swCustomVideo">
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/swWaitingRoom"

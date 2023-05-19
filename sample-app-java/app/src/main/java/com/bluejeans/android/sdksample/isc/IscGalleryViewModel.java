@@ -118,7 +118,12 @@ public class IscGalleryViewModel extends ViewModel {
                         })
         );
 
-        individualStreamsObserver = ObservableComputed.Companion.create(bjnParticipantMap.readonly(), videoStreamService.getVideoStreams(), false, (rosterParticipantMap, videoStream) -> {
+        individualStreamsObserver = ObservableComputed.Companion.create(
+                bjnParticipantMap.readonly(),
+                videoStreamService.getVideoStreams(),
+                compositeDisposable,
+                false,
+                (rosterParticipantMap, videoStream) -> {
             List<ParticipantUI> videoParticipants = new ArrayList<>();
             List<ParticipantUI> nonVideoParticipants = new ArrayList<>();
 

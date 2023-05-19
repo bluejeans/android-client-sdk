@@ -40,13 +40,18 @@ class IscParticipantListFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         addListeners()
-        loadIscParticipantsListAdapter()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         pinnedParticipant = null
         iscParticipantListAdapter = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        participantsViewBinding.rvRosterIscParticipants.adapter = null
+        loadIscParticipantsListAdapter()
     }
 
     fun updateMeetingList(rosterList: List<ParticipantsService.Participant>?) {

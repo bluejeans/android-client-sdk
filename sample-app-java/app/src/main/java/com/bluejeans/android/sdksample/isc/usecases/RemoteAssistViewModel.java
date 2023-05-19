@@ -100,7 +100,12 @@ public class RemoteAssistViewModel extends ViewModel {
                         })
         );
 
-        individualStreamsObserver = ObservableComputed.Companion.create(bjnParticipantMap.readonly(), videoStreamService.getVideoStreams(), false, (rosterParticipants, videoStream) -> {
+        individualStreamsObserver = ObservableComputed.Companion.create(
+                bjnParticipantMap.readonly(),
+                videoStreamService.getVideoStreams(),
+                compositeDisposable,
+                false,
+                (rosterParticipants, videoStream) -> {
             List<ParticipantUI> videoParticipants = new ArrayList<>();
 
 

@@ -131,11 +131,13 @@ public class IscParticipantListAdapter extends RecyclerView.Adapter<IscParticipa
                         )
                 );
 
-                bindingView.spParticipantPriority.setSelection(
-                        Arrays.asList(priorities).indexOf(
-                                priorities[participantConfiguration.get().getStreamPriority().ordinal()]
-                        )
-                );
+                if (participantConfiguration.get().getStreamPriority() != null) {
+                    bindingView.spParticipantPriority.setSelection(
+                            Arrays.asList(priorities).indexOf(
+                                    priorities[participantConfiguration.get().getStreamPriority().ordinal()]
+                            )
+                    );
+                }
             }
 
             if (pinnedParticipant != null && pinnedParticipant.equals(participant.getId())) {

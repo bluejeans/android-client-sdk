@@ -87,11 +87,14 @@ class IscParticipantListAdapter(
                 videoStreamService.videoStreamConfigurations.find { participant.id == it.participantGuid }
 
             participantConfiguration?.let {
-                bindingView.spParticipantPriority.setSelection(
-                    priorities.indexOf(
-                        priorities[it.streamPriority.ordinal]
-                    ), false
-                )
+                it.streamPriority?.ordinal?.let { priorityIndex ->
+                    bindingView.spParticipantPriority.setSelection(
+                        priorities.indexOf(
+                            priorities[priorityIndex]
+                        ), false
+                    )
+                }
+
                 bindingView.spParticipantResolution.setSelection(
                     resolutions.indexOf(
                         resolutions[it.streamQuality.ordinal]
@@ -108,11 +111,13 @@ class IscParticipantListAdapter(
                     if (it.streamPriority != bindingView.spParticipantPriority.selectedItem &&
                         it.streamQuality == getStreamQualityFromString(bindingView.spParticipantResolution.selectedItem.toString())) {
                         Toast.makeText(context, context.resources.getString(R.string.priority_error), Toast.LENGTH_LONG).show()
-                        bindingView.spParticipantPriority.setSelection(
-                            priorities.indexOf(
-                                priorities[it.streamPriority.ordinal]
-                            ), false
-                        )
+                        it.streamPriority?.ordinal?.let { priorityIndex ->
+                            bindingView.spParticipantPriority.setSelection(
+                                priorities.indexOf(
+                                    priorities[priorityIndex]
+                                ), false
+                            )
+                        }
                     } else {
                         Log.i(
                             TAG, "Setting resolution to: " +
@@ -153,7 +158,7 @@ class IscParticipantListAdapter(
 
             Log.i(
                 TAG,
-                "stream config: ${newVideoStreamConfig.streamQuality.name}, ${newVideoStreamConfig.streamPriority.name} " +
+                "stream config: ${newVideoStreamConfig.streamQuality.name}, ${newVideoStreamConfig.streamPriority?.name} " +
                         "for participant ${newVideoStreamConfig.participantGuid}"
             )
 

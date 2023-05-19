@@ -13,6 +13,9 @@
     <string name="audio_device">Audio Device</string>
     <string name="video_device">Video Device</string>
     <string name="stream_style">Video Stream Style</string>
+    <string name="custom_video">Custom Video</string>
+    <string name="frame_formats">Frame Formats</string>
+    <string name="custom_video_frame_format">Custom Video Frame Format</string>
     <string name="people">People</string>
     <string name="screen_share_notification_message">In Meeting, Content sharing is in progress.</string>
     <string name="meeting_notification_message">In Meeting</string>
@@ -72,4 +75,6 @@
         <item>Remote Learning</item>
         <item>Remote Assist</item>
     </string-array>
+
+    <string name="stop">Stop</string>
 </resources>

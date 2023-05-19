@@ -23,13 +23,16 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.FragmentContainerView
 import com.bjnclientcore.inmeeting.contentshare.ContentShareType
+import com.bjnclientcore.media.VideoSource
 import com.bjnclientcore.media.individualstream.StreamPriority
 import com.bjnclientcore.media.individualstream.StreamQuality
 import com.bjnclientcore.media.individualstream.VideoStreamStyle
 import com.bjnclientcore.ui.util.extensions.gone
 import com.bjnclientcore.ui.util.extensions.visible
 import com.bluejeans.android.sdksample.MeetingNotificationUtility.updateNotificationMessage
+import com.bluejeans.android.sdksample.ar.augmentedfaces.AugmentedFacesFragment
 import com.bluejeans.android.sdksample.databinding.ActivityMainBinding
 import com.bluejeans.android.sdksample.dialog.WaitingRoomDialog
 import com.bluejeans.android.sdksample.isc.IscGalleryFragment
@@ -58,6 +61,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val meetingService = SampleApplication.blueJeansSDK.meetingService
     private val videoDeviceService = SampleApplication.blueJeansSDK.videoDeviceService
     private val loggingService = SampleApplication.blueJeansSDK.loggingService
+    private val customVideoSourceService = SampleApplication.blueJeansSDK.customVideoSourceService
     private val appVersionString = "v" + SampleApplication.blueJeansSDK.version
     private val disposable = CompositeDisposable()
     private val inMeetingDisposable = CompositeDisposable()
@@ -86,6 +90,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var isAudioMuted = false
     private var isVideoMuted = false
     private var isVideoMutedBeforeBackgrounding = false
+    private var isVideoSourceCustom = false
     private var isRemoteContentAvailable = false
     private var isInWaitingRoom = false
     private var isWaitingRoomEnabled = false
@@ -99,6 +104,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var currentPinnedParticipant: String? = null
     private var remoteLearningFragment: RemoteLearningFragment? = null
     private var remoteAssistFragment: RemoteAssistFragment? = null
+
+    private var augmentedFacesFragment: AugmentedFacesFragment? = null
 
     private val streamConfigUpdatedCallback =
         object : IscParticipantListAdapter.IStreamConfigUpdatedCallback {
@@ -161,6 +168,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         Timber.tag(TAG).i("onDestroy")
+        if (meetingService.meetingState.value == MeetingService.MeetingState.Connected) {
+            meetingService.endMeeting()
+            endMeeting()
+        }
         disposable.dispose()
         inMeetingDisposable.dispose()
         bottomSheetFragment = null
@@ -881,6 +892,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         inMeetingFragment?.onDestroy()
         remoteLearningFragment?.onDestroy()
         remoteAssistFragment?.onDestroy()
+        augmentedFacesFragment?.onDestroy()
         iscGalleryFragment = IscGalleryFragment()
         inMeetingFragment = InMeetingFragment()
         val inMeetingFragment = if (showIscFragment) iscGalleryFragment!! else inMeetingFragment!!
@@ -1120,6 +1132,31 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         override fun setWaitingRoomEnabled(enabled: Boolean) {
             meetingService.moderatorWaitingRoomService.setWaitingRoomEnabled(enabled)
+        }
+
+        override fun setCustomVideoSource(isCustom: Boolean) {
+            isVideoSourceCustom = isCustom
+            bottomSheetFragment?.updateCustomVideoSwitchState(isVideoSourceCustom)
+            if (isCustom) {
+                augmentedFacesFragment = null
+                augmentedFacesFragment = AugmentedFacesFragment.newInstance(this@MainActivity)
+
+                binding.selfView.root.visibility = View.GONE
+                binding.customVideoFragmentContainer.visibility = View.VISIBLE
+
+                supportFragmentManager.beginTransaction()
+                    .replace(binding.customVideoFragmentContainer.id, augmentedFacesFragment!!)
+                    .commit()
+            } else {
+                augmentedFacesFragment?.let {
+                    supportFragmentManager.beginTransaction()
+                        .remove(it)
+                        .commit()
+                }
+
+                binding.customVideoFragmentContainer.visibility = View.GONE
+                binding.selfView.root.visibility = View.VISIBLE
+            }
         }
     }
 

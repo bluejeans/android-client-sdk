@@ -19,7 +19,9 @@ import com.bjnclientcore.media.individualstream.VideoStreamConfiguration;
 import com.bjnclientcore.media.individualstream.VideoStreamConfigurationResult;
 import com.bluejeans.android.sdksample.databinding.FragmentRemoteLearningBinding;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RemoteLearningFragment extends Fragment {
@@ -29,6 +31,7 @@ public class RemoteLearningFragment extends Fragment {
     private RemoteLearningParticipant moderator = null;
     private List<RemoteLearningParticipant> students = new ArrayList<>();
     private List<TextureView> studentTextureViews = new ArrayList<>();
+    private Map<Integer, Float> textureViewToAspectRatioMap = new HashMap();
 
     private RemoteLearningViewModel viewModel;
 
@@ -60,6 +63,12 @@ public class RemoteLearningFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this).get(RemoteLearningViewModel.class);
         viewModel.participantsObservable.observe(getViewLifecycleOwner(), studentsList -> {
+            if (studentsList.isEmpty()) {
+                toggleModeratorUIVisibility(true);
+                textureViewToAspectRatioMap.clear();
+                return;
+            }
+
             for (TextureView v : studentTextureViews) {
                 v.setVisibility(View.GONE);
             }
@@ -111,6 +120,8 @@ public class RemoteLearningFragment extends Fragment {
         students.forEach(student -> {
             viewModel.detachParticipantFromView(student.getParticipantId());
         });
+
+        textureViewToAspectRatioMap.clear();
     }
 
     @Override
@@ -123,6 +134,7 @@ public class RemoteLearningFragment extends Fragment {
 
     private void updateModeratorUI() {
         if (moderator != null) {
+            toggleModeratorUIVisibility(false);
             binding.layoutMainStage.tvParticipantName.setText(moderator.getName());
 
             if (!moderator.isVideo()) {
@@ -141,6 +153,7 @@ public class RemoteLearningFragment extends Fragment {
         } else {
             binding.layoutMainStage.tvParticipantName.setText("");
             binding.layoutMainStage.cnhAudioOnly.setVisibility(View.GONE);
+            binding.layoutMainStage.participantTextureView.setVisibility(View.GONE);
         }
     }
 
@@ -182,22 +195,17 @@ public class RemoteLearningFragment extends Fragment {
     }
 
     private void setStudentTextureViewConstraints(int videoWidth, int videoHeight, TextureView textureView) {
-        ConstraintSet set = new ConstraintSet();
-        set.clone(binding.layoutMainStage.getRoot());
-        set.connect(textureView.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT);
-        set.connect(textureView.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT);
-        set.connect(textureView.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
-        set.connect(textureView.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
-
-        if (moderator != null) {
-            if (videoWidth > 0 && videoHeight > 0) {
-                float ratio = ((float) videoWidth / videoHeight);
-                Log.i(TAG, "Ratio: " + ratio);
+        if (videoWidth > 0 && videoHeight > 0) {
+            float ratio = ((float) videoWidth / videoHeight);
+            if (textureViewToAspectRatioMap.get(textureView.getId()) == null || textureViewToAspectRatioMap.get(textureView.getId()) != ratio) {
+                Log.i(TAG, "Ratio of student textureView: " + ratio);
+                ConstraintSet set = new ConstraintSet();
+                set.clone(binding.layoutMainStage.getRoot());
                 set.setDimensionRatio(textureView.getId(), String.valueOf(ratio));
+                set.applyTo((ConstraintLayout) textureView.getParent());
+                textureViewToAspectRatioMap.put(textureView.getId(), ratio);
             }
         }
-
-        set.applyTo((ConstraintLayout) textureView.getParent());
     }
 
     private void updateStudentsUI() {
@@ -228,5 +236,15 @@ public class RemoteLearningFragment extends Fragment {
     private void configurePortraitView() {
         binding.scrollView.setVisibility(View.VISIBLE);
         setModeratorTextureViewConstraints();
+    }
+
+    private void toggleModeratorUIVisibility(Boolean isHidden) {
+        if (isHidden) {
+            binding.layoutMainStage.cnhAudioOnly.setVisibility(View.GONE);
+            binding.layoutMainStage.participantTextureView.setVisibility(View.GONE);
+            binding.layoutMainStage.tvParticipantName.setVisibility(View.GONE);
+        } else {
+            binding.layoutMainStage.tvParticipantName.setVisibility(View.VISIBLE);
+        }
     }
 }

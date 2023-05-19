@@ -37,6 +37,7 @@
     <string name="togglecc">CC</string>
     <string name="hd_capture">720 Capture</string>
     <string name="hd_receive">720 Receive</string>
+    <string name="custom_video">Custom Video</string>
     <string name="show_isc">Show individual streams</string>
     <string name="stream_style">Video Stream Style</string>
 
@@ -71,4 +72,6 @@
         <item>Remote Learning</item>
         <item>Remote Assist</item>
     </string-array>
+
+    <string name="exit">Exit</string>
 </resources>

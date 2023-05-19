@@ -70,7 +70,12 @@ public class RemoteLearningViewModel extends ViewModel {
                         })
         );
 
-        individualStreamsObserver = ObservableComputed.Companion.create(bjnParticipantMap.readonly(), videoStreamService.getVideoStreams(), false, (rosterParticipantMap, videoStream) -> {
+        individualStreamsObserver = ObservableComputed.Companion.create(
+                bjnParticipantMap.readonly(),
+                videoStreamService.getVideoStreams(),
+                compositeDisposable,
+                false,
+                (rosterParticipantMap, videoStream) -> {
             List<RemoteLearningParticipant> remoteLearningParticipants = new ArrayList<>();
 
             rosterParticipantMap.forEach((key, value) -> {
