@@ -56,7 +56,38 @@
   <div class="cover ">
     <h1 class="cover"><span>push</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Video</span><wbr></wbr><span><span>Frame</span></span></h1>
   </div>
-  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="push-custom-video-frame.html"><span class="token function">pushCustomVideoFrame</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">frame<span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore.media/BJNVideoFrame///PointingToDeclaration/">BJNVideoFrame</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore.media/PushVideoFrameResult///PointingToDeclaration/">PushVideoFrameResult</span></div><p class="paragraph">Sends a custom video frame.</p><h4 class="">Parameters</h4><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><u><span><span>frame</span></span></u></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">custom video frame of type <span data-unresolved-link="com.bjnclientcore.media/BJNVideoFrame///PointingToDeclaration/">BJNVideoFrame</span></p></div></div></div></div></div></div></div></div></div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":library:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword"></span><span class="token keyword">fun </span><a href="push-custom-video-frame.html"><span class="token function">pushCustomVideoFrame</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">frame<span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore.media/BJNVideoFrame///PointingToDeclaration/">BJNVideoFrame</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.bjnclientcore.media/PushVideoFrameResult///PointingToDeclaration/">PushVideoFrameResult</span></div><p class="paragraph">Sends a custom video frame. The response from this API is either Success or Failure</p><p class="paragraph">If Failure then the reason can be,</p><ul>
+    <li>IncorrectFrameFormat</li>
+    <li>UnsupportedAspectRatio</li>
+    <li>NotUsingCustomVideoSource</li>
+    <li>CameraNotClosed</li>
+    <li>VideoMuted</li>
+</ul>
+<h4 class="">Parameters</h4><div data-togglable="Parameters"><div class="table" data-togglable="Parameters"><div class="table-row" data-filterable-current=":library:dokkaHtml/release" data-filterable-set=":library:dokkaHtml/release"><div class="main-subrow keyValue WithExtraAttributes"><div class=""><span class="inline-flex"><div><u><span><span>frame</span></span></u></div></span></div><div><div class="title"><div data-togglable="Parameters"><p class="paragraph">custom video frame of type <span data-unresolved-link="com.bjnclientcore.media/BJNVideoFrame///PointingToDeclaration/">BJNVideoFrame</span> consists of,</p><ul>
+    <li>frameDate - CustomFrameData</li>
+    <li>frameOrientation - FrameOrientation</li>
+    <li>frameFormat - FrameFormat</li>
+    <li>isMirrored - Boolean</li>
+</ul><p class="paragraph">CustomFrameData,</p><ul>
+    <li>buffer - ByteBuffer</li>
+    <li>yStride - Int</li>
+    <li>uBuffer - ByteBuffer</li>
+    <li>vBuffer - ByteBuffer</li>
+    <li>uvRowStride - Int</li>
+    <li>uvPixelStride - Int</li>
+    <li>width - Int</li>
+    <li>height - Int</li>
+</ul><p class="paragraph">FrameOrientation,</p><ul>
+    <li>ORIENTATION_0 - 0°</li>
+    <li>ORIENTATION_90 - 90°</li>
+    <li>ORIENTATION_180 - 180°</li>
+    <li>ORIENTATION_270 - 270°</li>
+</ul><p class="paragraph">FrameFormat,</p><ul>
+    <li>ARGB</li>
+    <li>RGB565</li>
+    <li>I420</li>
+    <li>NV21</li>
+</ul></div></div></div></div></div></div></div></div></div>
 </div>
       <div class="footer">
         <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span
