@@ -40,12 +40,14 @@ With BlueJeans Android Client SDK, participants can join video conference meetin
 - 720p video capture
 - 720p video receive
 - Individual video stream
+- Custom video source
 
 ## New Features :
-- Custom video source
-- Target SDK API level 33
+- Pagination support for participants tiles in a meeting
+- Unique External Identifier support
+- Miscellaneous bug fixes
 
-## Current Version : 1.7.0
+## Current Version : 1.8.0
 
 ## Pre-requisites :
 - **Android API level :** Min level 26
