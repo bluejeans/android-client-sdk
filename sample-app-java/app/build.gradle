@@ -10,9 +10,9 @@ android {
         applicationId "com.bluejeans.android.sdksample"
         minSdkVersion 26
         targetSdkVersion 33
-        versionCode 17
+        versionCode 18
         multiDexEnabled true
-        versionName "1.7.0"
+        versionName "1.8.0"
     }
 
     buildTypes {
@@ -56,5 +56,5 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
 
     //BlueJeans Android Client SDK
-    implementation "com.bluejeans:android-client-sdk:1.7.0"
+    implementation "com.bluejeans:android-client-sdk:1.8.0"
 }

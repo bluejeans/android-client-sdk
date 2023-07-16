@@ -3,13 +3,16 @@
  */
 package com.bluejeans.android.sdksample.menu
 
+import android.media.MediaRecorder.VideoSource
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
 import com.bjnclientcore.ui.util.extensions.gone
 import com.bjnclientcore.ui.util.extensions.visible
+import com.bluejeans.android.sdksample.R
 import com.bluejeans.android.sdksample.SampleApplication
 import com.bluejeans.android.sdksample.databinding.FragmentOptionMenuDialogBinding
 import com.bluejeans.bluejeanssdk.meeting.MeetingService
@@ -180,8 +183,12 @@ class MenuFragment(
         }
 
         menuFragmentBinding?.mbVideoDevice?.setOnClickListener {
-            menuCallBack.showVideoDeviceView()
-            dismiss()
+            if (SampleApplication.blueJeansSDK.customVideoSourceService.currentVideoSource.value == com.bjnclientcore.media.VideoSource.Custom) {
+                Toast.makeText(context, resources.getString(R.string.no_video_device_change), Toast.LENGTH_LONG).show()
+            } else {
+                menuCallBack.showVideoDeviceView()
+                dismiss()
+            }
         }
 
         if (isIscSelected) {

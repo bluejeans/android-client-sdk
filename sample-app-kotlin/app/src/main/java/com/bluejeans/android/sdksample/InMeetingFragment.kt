@@ -15,11 +15,13 @@ import androidx.viewpager2.widget.ViewPager2
 import com.bjnclientcore.ui.util.extensions.gone
 import com.bjnclientcore.ui.util.extensions.visible
 import com.bluejeans.android.sdksample.databinding.FragmentInmeetingBinding
+import com.bluejeans.android.sdksample.viewpager.PageIndicatorAdapter
+import com.bluejeans.android.sdksample.viewpager.RemoteViewFragment
 import com.bluejeans.android.sdksample.viewpager.ScreenSlidePagerAdapter
 import com.bluejeans.bluejeanssdk.meeting.MeetingService
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
 
 /**
  * A InMeeting fragment responsible for showing remote video & remote content.
@@ -32,6 +34,9 @@ class InMeetingFragment : Fragment() {
     private var pagerAdapter: ScreenSlidePagerAdapter? = null
     private val disposable = CompositeDisposable()
     private var isRemoteContentAvailable = false
+    private var isViewPagerScrollable = false
+    private var pageIndicatorAdapter: PageIndicatorAdapter? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,41 +53,57 @@ class InMeetingFragment : Fragment() {
         registerForSubscription()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable.dispose()
+    }
+
     private fun registerForSubscription() {
         subscribeForRemoteContentState()
         subscribeForVideoState()
+        observePagination()
+        subscribeForVideoLayout()
     }
 
     private fun initializeViews() {
         pagerAdapter = ScreenSlidePagerAdapter(this)
         inMeetingFragmentBinding?.vpViewPager?.adapter = pagerAdapter
-        inMeetingFragmentBinding?.tabLayout?.let {
-            inMeetingFragmentBinding?.vpViewPager?.let { viewPager ->
-                TabLayoutMediator(
-                    it, viewPager
-                ) { _: TabLayout.Tab?, _: Int -> }.attach()
-            }
-        }
+        pageIndicatorAdapter = PageIndicatorAdapter()
+        pageIndicatorAdapter?.updateListItem(TOTAL_VIEW_PAGER_PAGES)
+
+        inMeetingFragmentBinding?.recyclerPageIndicator?.adapter = pageIndicatorAdapter
         inMeetingFragmentBinding?.vpViewPager?.registerOnPageChangeCallback(PagerChangeCallback())
         inMeetingFragmentBinding?.vpViewPager?.offscreenPageLimit = 1
+        inMeetingFragmentBinding?.vpViewPager?.setCurrentItem(1, false)
+
+        inMeetingFragmentBinding?.vpViewPager?.getChildAt(0)?.setOnTouchListener { _, event ->
+            val currentFragment = childFragmentManager.findFragmentByTag("f" + inMeetingFragmentBinding?.vpViewPager?.currentItem)
+            if (currentFragment is RemoteViewFragment) {
+                SampleApplication.blueJeansSDK.meetingService.dispatchTouchEvent(event)
+            }
+            isViewPagerScrollable
+        }
+
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        Log.d(TAG, "onConfigurationChanged")
-        /* The multi-stream remote video fragment computes size at run-time, when handling config change and using
-        viewpager2, we need to make sure video fragment or video fragment's parent is visible on Config change inorder to
-        propagate dimensions at runtime.*/
-        inMeetingFragmentBinding?.vpViewPager?.currentItem = 0
     }
 
     private inner class PagerChangeCallback : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
             when (position) {
-                0 -> handleVideoState()
-                1 -> handleRemoteContentState()
+                0 -> {
+                    if (meetingService.currentRemoteVideoPage.value == 1) {
+                        handleRemoteContentState()
+                    }
+                }
+                1 -> {
+                    handleVideoState()
+                }
             }
+            pageIndicatorAdapter?.shiftIndicator(position)
         }
     }
 
@@ -98,6 +119,60 @@ class InMeetingFragment : Fragment() {
         ) {
             Log.e(TAG, "Error in video state subscription")
         })
+    }
+
+    private fun observePagination() {
+        meetingService.currentRemoteVideoPage.rxObservable
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                inMeetingFragmentBinding?.let { binding ->
+                    isViewPagerScrollable = it != 1
+                    if (it > 0) {
+                        pageIndicatorAdapter?.shiftIndicator(it)
+                    }
+                    Log.i(TAG, "Current page: $it")
+                } ?: kotlin.run { Log.e(TAG, "Cannot find meeting binding") }
+            }, {
+                Log.e(TAG, "Error in getting current page number: ${it.message}")
+            }).addTo(disposable)
+
+        meetingService.totalRemoteVideoPages.rxObservable
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Log.i(TAG, "Total pages: $it")
+                if (it > 0) {
+                    pageIndicatorAdapter?.updateListItem(it + 1)
+                } else {
+                    pageIndicatorAdapter?.updateListItem(TOTAL_VIEW_PAGER_PAGES)
+                }
+
+                if (it == 1) {
+                    pageIndicatorAdapter?.shiftIndicator(1)
+                }
+            }, {
+                Log.e(TAG, "Error in getting total pages: ${it.stackTraceToString()}")
+            }).addTo(disposable)
+    }
+
+    private fun subscribeForVideoLayout() {
+        disposable.add(
+            meetingService.videoLayout.rxObservable
+                .observeOn(AndroidSchedulers.mainThread())
+                .skip(1)
+                .filter { it.value != null }
+                .subscribe({
+                    Log.i(TAG, "Inside video layout sub: ${it.value}")
+                    if (it.value == MeetingService.VideoLayout.Speaker) {
+                        pageIndicatorAdapter?.updateListItem(TOTAL_VIEW_PAGER_PAGES)
+                    }
+
+                    inMeetingFragmentBinding?.vpViewPager?.let { viewPager ->
+                        pageIndicatorAdapter?.shiftIndicator(viewPager.currentItem)
+                    }
+                }, {
+                    Log.e(TAG, "Error while subscribing to video layouts: ${it.message}")
+                })
+        )
     }
 
     private fun subscribeForRemoteContentState() {
@@ -151,5 +226,6 @@ class InMeetingFragment : Fragment() {
 
     companion object {
         const val TAG = "InMeetingFragment"
+        const val TOTAL_VIEW_PAGER_PAGES = 2
     }
 }

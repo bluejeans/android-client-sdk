@@ -65,6 +65,7 @@
 
     <string name="press_back">Press back to exit</string>
     <string name="no_individual_streams">\"Show individual streams\" was not selected while joining</string>
+    <string name="no_video_device_change">You cannot change video device when custom video is in use.</string>
 
     <string-array name="stream_styles">
         <item>Fit To View</item>

@@ -74,7 +74,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import static com.bluejeans.android.sdksample.utils.AudioDeviceHelper.getAudioDeviceName;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.SingleSource;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -90,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final LoggingService mLoggingService = SampleApplication.getBlueJeansSDK().getLoggingService();
     private final MeetingService mMeetingService = SampleApplication.getBlueJeansSDK().getMeetingService();
     private final VideoDeviceService mVideoDeviceService = SampleApplication.getBlueJeansSDK().getVideoDeviceService();
-
     private final CompositeDisposable mDisposable = new CompositeDisposable();
     private final CompositeDisposable mInMeetingDisposable = new CompositeDisposable();
     private boolean mIsAudioMuted = false, mIsVideoMuted = false, mIsVideoMutedBeforeBackgrounding = false, mIsVideoSourceCustom = false;
@@ -463,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         showJoiningInProgressView();
         mInMeetingDisposable.add(mMeetingService.joinMeeting(
                         new MeetingService.JoinParams
-                                (meetingId, passcode, name))
+                                (meetingId, passcode, name, null))
                 .subscribeOn(Schedulers.single())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -606,7 +604,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
 
                         if (getSupportFragmentManager().findFragmentById(R.id.inMeetingFragmentContainer) instanceof IscGalleryFragment &&
-                            videoLayout != MeetingService.VideoLayout.Custom.INSTANCE) {
+                                videoLayout != MeetingService.VideoLayout.Custom.INSTANCE) {
                             replaceInMeetingFragment(false);
                         }
 
@@ -1062,20 +1060,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void configurePortraitView() {
+        final float scale = this.getApplicationContext().getResources().getDisplayMetrics().density;
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mSelfView.getLayoutParams();
         params.startToStart = R.id.parent_layout;
         params.topToTop = R.id.parent_layout;
         params.endToEnd = R.id.parent_layout;
         params.dimensionRatio = getResources().getString(R.string.self_view_ratio);
+        params.width = (int) (180 * scale + 0.5f);
         mSelfView.requestLayout();
     }
 
     private void configureLandscapeView() {
+        final float scale = this.getApplicationContext().getResources().getDisplayMetrics().density;
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mSelfView.getLayoutParams();
         params.startToStart = ConstraintLayout.LayoutParams.UNSET;
         params.topToTop = R.id.parent_layout;
         params.endToEnd = R.id.parent_layout;
         params.dimensionRatio = getResources().getString(R.string.self_view_ratio);
+        params.width = (int) (100 * scale + 0.5f);
         mSelfView.requestLayout();
     }
 
@@ -1160,7 +1162,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mBottomSheetFragment.updateCustomVideoSwitchState(mIsVideoSourceCustom);
                     if (isCustom) {
                         mAugmentedFacesFragment = null;
-                        mAugmentedFacesFragment = new AugmentedFacesFragment();
+                        mAugmentedFacesFragment = new AugmentedFacesFragment(mIsAudioMuted, mIsVideoMuted);
 
                         mSelfView.setVisibility(View.GONE);
                         mCustomVideoFragmentContainer.setVisibility(View.VISIBLE);

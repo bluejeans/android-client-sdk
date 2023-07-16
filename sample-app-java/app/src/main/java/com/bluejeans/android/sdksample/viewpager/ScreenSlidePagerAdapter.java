@@ -18,9 +18,9 @@ public class ScreenSlidePagerAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         if (position == 1) {
-            return new ContentViewFragment();
+            return new RemoteViewFragment();
         }
-        return new RemoteViewFragment();
+        return new ContentViewFragment();
     }
 
     @Override

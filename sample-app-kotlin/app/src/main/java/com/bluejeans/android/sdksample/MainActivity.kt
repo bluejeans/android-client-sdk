@@ -23,9 +23,7 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.FragmentContainerView
 import com.bjnclientcore.inmeeting.contentshare.ContentShareType
-import com.bjnclientcore.media.VideoSource
 import com.bjnclientcore.media.individualstream.StreamPriority
 import com.bjnclientcore.media.individualstream.StreamQuality
 import com.bjnclientcore.media.individualstream.VideoStreamStyle
@@ -550,7 +548,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             { videoLayout ->
                 if (videoLayout != null) {
                     if (supportFragmentManager.findFragmentById(R.id.inMeetingFragmentContainer) is IscGalleryFragment &&
-                            videoLayout != MeetingService.VideoLayout.Custom) {
+                        videoLayout != MeetingService.VideoLayout.Custom) {
                         replaceInMeetingFragment(false)
                     }
                     currentVideoLayout = videoLayout
@@ -1007,20 +1005,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun configurePortraitView() {
+        val scale = applicationContext.resources.displayMetrics.density
         val params = binding.selfView.selfView.layoutParams as ConstraintLayout.LayoutParams
         params.startToStart = R.id.parent_layout
         params.topToTop = R.id.parent_layout
         params.endToEnd = R.id.parent_layout
         params.dimensionRatio = resources.getString(R.string.self_view_ratio)
+        params.width = (180 * scale + 0.5f).toInt()
         binding.selfView.selfView.requestLayout()
     }
 
     private fun configureLandscapeView() {
+        val scale = applicationContext.resources.displayMetrics.density
         val params = binding.selfView.selfView.layoutParams as ConstraintLayout.LayoutParams
         params.startToStart = ConstraintLayout.LayoutParams.UNSET
         params.topToTop = R.id.parent_layout
         params.endToEnd = R.id.parent_layout
         params.dimensionRatio = resources.getString(R.string.self_view_ratio)
+        params.width = (100 * scale + 0.5f).toInt()
         binding.selfView.selfView.requestLayout()
     }
 
@@ -1139,7 +1141,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             bottomSheetFragment?.updateCustomVideoSwitchState(isVideoSourceCustom)
             if (isCustom) {
                 augmentedFacesFragment = null
-                augmentedFacesFragment = AugmentedFacesFragment.newInstance(this@MainActivity)
+                augmentedFacesFragment = AugmentedFacesFragment.newInstance(this@MainActivity, isAudioMuted, isVideoMuted)
 
                 binding.selfView.root.visibility = View.GONE
                 binding.customVideoFragmentContainer.visibility = View.VISIBLE

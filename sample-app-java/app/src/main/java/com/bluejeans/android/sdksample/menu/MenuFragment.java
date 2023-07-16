@@ -11,9 +11,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
+
+import com.bjnclientcore.media.VideoSource;
 import com.bluejeans.android.sdksample.R;
 import com.bluejeans.android.sdksample.SampleApplication;
 import com.bluejeans.bluejeanssdk.meeting.MeetingService;
@@ -233,8 +237,13 @@ public class MenuFragment extends BottomSheetDialogFragment {
             dismiss();
         });
         mMbVideoDevice.setOnClickListener(view1 -> {
-            mIMenuCallback.showVideoDeviceView();
-            dismiss();
+            if (SampleApplication.getBlueJeansSDK().getCustomVideoSourceService().getCurrentVideoSource().getValue() == VideoSource.Custom.INSTANCE) {
+                Toast.makeText(getContext(), getResources().getString(R.string.no_video_device_change), Toast.LENGTH_LONG)
+                        .show();
+            } else {
+                mIMenuCallback.showVideoDeviceView();
+                dismiss();
+            }
         });
 
         if (this.mIsWaitingRoomEnabled) {

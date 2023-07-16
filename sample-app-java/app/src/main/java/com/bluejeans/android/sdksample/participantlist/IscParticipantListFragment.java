@@ -48,6 +48,12 @@ public class IscParticipantListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         addListeners();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        participantsViewBinding.rvRosterIscParticipants.setAdapter(null);
         loadIscParticipantsListAdapter();
     }
 
@@ -82,9 +88,7 @@ public class IscParticipantListFragment extends Fragment {
     }
 
     private void loadIscParticipantsListAdapter() {
-        if (iscParticipantListAdapter == null) {
-            iscParticipantListAdapter = new IscParticipantListAdapter(getContext(), streamConfigUpdatedCallback, pinnedParticipant);
-        }
+        iscParticipantListAdapter = new IscParticipantListAdapter(getContext(), streamConfigUpdatedCallback, pinnedParticipant);
         participantsViewBinding.rvRosterIscParticipants.setAdapter(iscParticipantListAdapter);
         iscParticipantListAdapter.updateMeetingList(participantsList);
     }

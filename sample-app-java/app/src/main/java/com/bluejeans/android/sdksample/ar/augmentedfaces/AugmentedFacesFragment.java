@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2023 Blue Jeans Network, Inc. All rights reserved.
+ */
 package com.bluejeans.android.sdksample.ar.augmentedfaces;
 
 import static com.bluejeans.android.sdksample.ar.common.helpers.ARUtils.getBitmapFromSurface;
@@ -22,12 +25,14 @@ import com.bjnclientcore.media.CustomFrameData;
 import com.bjnclientcore.media.FrameFormat;
 import com.bjnclientcore.media.FrameOrientation;
 import com.bjnclientcore.media.VideoSource;
+import com.bluejeans.android.sdksample.R;
 import com.bluejeans.android.sdksample.SampleApplication;
 import com.bluejeans.android.sdksample.ar.common.helpers.DisplayRotationHelper;
 import com.bluejeans.android.sdksample.ar.common.rendering.BackgroundRenderer;
 import com.bluejeans.android.sdksample.ar.common.rendering.ObjectRenderer;
 import com.bluejeans.android.sdksample.databinding.FragmentAugmentedFacesBinding;
 import com.bluejeans.bluejeanssdk.customvideo.CustomVideoSourceService;
+import com.bluejeans.bluejeanssdk.meeting.MeetingService;
 import com.bluejeans.bluejeanssdk.permission.PermissionService;
 import com.google.ar.core.AugmentedFace;
 import com.google.ar.core.Camera;
@@ -53,7 +58,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link AugmentedFacesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class AugmentedFacesFragment extends Fragment implements GLSurfaceView.Renderer {
@@ -83,15 +87,17 @@ public class AugmentedFacesFragment extends Fragment implements GLSurfaceView.Re
 
     private final PermissionService mPermissionService = SampleApplication.getBlueJeansSDK().getPermissionService();
     private final CustomVideoSourceService mCustomVideoSourceService = SampleApplication.getBlueJeansSDK().getCustomVideoSourceService();
+    private final MeetingService mMeetingService = SampleApplication.getBlueJeansSDK().getMeetingService();
 
     private int width, height;
 
     private FragmentAugmentedFacesBinding binding = null;
-    public static AugmentedFacesFragment newInstance() {
-        AugmentedFacesFragment fragment = new AugmentedFacesFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+
+    private Boolean mIsAudioMuted = false, mIsVideoMuted = false;
+
+    public AugmentedFacesFragment(Boolean mIsAudioMuted, Boolean mIsVideoMuted) {
+        this.mIsAudioMuted = mIsAudioMuted;
+        this.mIsVideoMuted = mIsVideoMuted;
     }
 
     @Override
@@ -119,6 +125,30 @@ public class AugmentedFacesFragment extends Fragment implements GLSurfaceView.Re
         binding.surfaceView.setRenderer(this);
         binding.surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         binding.surfaceView.setWillNotDraw(false);
+
+        binding.ivMic.setOnClickListener(v -> {
+            mIsAudioMuted = !mIsAudioMuted;
+            mMeetingService.setAudioMuted(mIsAudioMuted);
+            toggleAudioMuteUnMuteView();
+        });
+
+        binding.ivVideo.setOnClickListener(v -> {
+            mIsVideoMuted = !mIsVideoMuted;
+            if (mIsVideoMuted && session != null) {
+                session.pause();
+            } else if (session != null) {
+                try {
+                    session.resume();
+                } catch (CameraNotAvailableException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            mMeetingService.setVideoMuted(mIsVideoMuted);
+            toggleVideoMuteUnMuteView();
+        });
+
+        toggleAudioMuteUnMuteView();
+        toggleVideoMuteUnMuteView();
     }
 
     @Override
@@ -320,5 +350,20 @@ public class AugmentedFacesFragment extends Fragment implements GLSurfaceView.Re
         Config config = new Config(session);
         config.setAugmentedFaceMode(Config.AugmentedFaceMode.MESH3D);
         session.configure(config);
+    }
+
+    private void toggleAudioMuteUnMuteView() {
+        if (binding != null) {
+            int resID = mIsAudioMuted ? R.drawable.mic_off_black : R.drawable.mic_on_black;
+            binding.ivMic.setImageResource(resID);
+        }
+    }
+
+    private void toggleVideoMuteUnMuteView() {
+        if (binding != null) {
+            int resID = mIsVideoMuted ? R.drawable.videocam_off_black : R.drawable.videocam_on_black;
+            binding.ivVideo.setImageResource(resID);
+        }
+
     }
 }

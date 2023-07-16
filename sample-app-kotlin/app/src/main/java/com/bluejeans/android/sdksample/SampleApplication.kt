@@ -4,7 +4,6 @@
 package com.bluejeans.android.sdksample
 
 import android.app.Application
-import android.util.Log
 import com.bluejeans.bluejeanssdk.BlueJeansSDK
 import com.bluejeans.bluejeanssdk.BlueJeansSDKInitParams
 
@@ -12,11 +11,6 @@ class SampleApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         initSDK()
-        Log.i(
-            TAG, "App VersionName ${BuildConfig.VERSION_NAME} " +
-                    "App VersionCode ${BuildConfig.VERSION_CODE} " +
-                    "SDK VersionName ${blueJeansSDK.version}"
-        )
     }
 
     private fun initSDK() {

@@ -7,6 +7,7 @@ package com.bluejeans.android.sdksample;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +16,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
+
+import com.bluejeans.android.sdksample.viewpager.PageIndicatorAdapter;
+import com.bluejeans.android.sdksample.viewpager.RemoteViewFragment;
 import com.bluejeans.android.sdksample.viewpager.ScreenSlidePagerAdapter;
 import com.bluejeans.bluejeanssdk.meeting.MeetingService;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.util.ArrayList;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import kotlin.Unit;
 
@@ -30,6 +36,8 @@ import kotlin.Unit;
 public class InMeetingFragment extends Fragment {
 
     private static final String TAG = "InMeetingFragment";
+    private static final int TOTAL_VIEW_PAGER_PAGES = 2;
+    private Boolean isTouchEventConsumed = false;
 
     private final MeetingService mMeetingService = SampleApplication.getBlueJeansSDK().getMeetingService();
     private final CompositeDisposable mDisposable = new CompositeDisposable();
@@ -37,8 +45,9 @@ public class InMeetingFragment extends Fragment {
     private MeetingService.VideoState mVideoState;
     private boolean mIsRemoteContentAvailable;
     private ViewPager2 mViewPager;
-    private TabLayout mTabLayout;
+    private RecyclerView mPageIndicator;
     private TextView mTvInMeetingState;
+    private PageIndicatorAdapter mPageIndicatorAdapter = null;
 
     @Nullable
     @Override
@@ -53,40 +62,57 @@ public class InMeetingFragment extends Fragment {
         registerForSubscription();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDisposable.dispose();
+    }
+
     private void initializeViews(View view) {
         mViewPager = view.findViewById(R.id.vpViewPager);
-        mTabLayout = view.findViewById(R.id.tabLayout);
+        mPageIndicator = view.findViewById(R.id.recyclerPageIndicator);
         mTvInMeetingState = view.findViewById(R.id.tvInMeetingState);
         ScreenSlidePagerAdapter mPagerAdapter = new ScreenSlidePagerAdapter(this);
+        mPageIndicatorAdapter = new PageIndicatorAdapter(new ArrayList<>());
+        mPageIndicatorAdapter.updateListItem(TOTAL_VIEW_PAGER_PAGES);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.registerOnPageChangeCallback(mPagerCallBackListener);
-        new TabLayoutMediator(mTabLayout, mViewPager, (tab, position) -> {
-        }).attach();
+        mPageIndicator.setAdapter(mPageIndicatorAdapter);
+        mViewPager.setCurrentItem(1, false);
+
+        mViewPager.getChildAt(0).setOnTouchListener((v, event) -> {
+            Fragment currentFragment = getChildFragmentManager().findFragmentByTag("f" + mViewPager.getCurrentItem());
+            if (currentFragment != null && currentFragment instanceof RemoteViewFragment) {
+                mMeetingService.dispatchTouchEvent(event);
+            }
+            return isTouchEventConsumed;
+        });
     }
 
     private void registerForSubscription() {
         subscribeForRemoteContentState();
         subscribeForVideoState();
+        observePagination();
+        subscribeForVideoLayout();
     }
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Log.d(TAG, "onConfigurationChanged");
-        /* The multi-stream remote video fragment computes size at run-time, when handling config change and using
-        viewpager2, we need to make sure video fragment or video fragment's parent is visible on Config change inorder to
-        propagate dimensions at runtime.*/
-        mViewPager.setCurrentItem(0);
     }
 
     private class PagerChangeCallback extends ViewPager2.OnPageChangeCallback {
         @Override
         public void onPageSelected(int position) {
             super.onPageSelected(position);
-            if (position == 0) {
-                handleVideoState();
-            } else if (position == 1) {
+            if (position == 0 && mMeetingService.getCurrentRemoteVideoPage().getValue() == 1) {
                 handleRemoteContentState();
+            } else if (position == 1) {
+                handleVideoState();
+            }
+            if (mPageIndicatorAdapter != null) {
+                Log.i("PageIndicator", "Shifting to position: " + position);
+                mPageIndicatorAdapter.shiftIndicator(position);
             }
         }
     }
@@ -106,6 +132,62 @@ public class InMeetingFragment extends Fragment {
                     Log.e(TAG, "Error in video state subscription" + err.getMessage());
                     return Unit.INSTANCE;
                 }));
+    }
+
+    private void observePagination() {
+        mDisposable.add(mMeetingService.getCurrentRemoteVideoPage().getRxObservable()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(currentPage -> {
+                isTouchEventConsumed = currentPage != 1;
+                Log.i(TAG, "Current page: " + currentPage);
+                if (currentPage > 0 && mPageIndicatorAdapter != null) {
+                    mPageIndicatorAdapter.shiftIndicator(currentPage);
+                }
+            }, err -> {
+                Log.e(TAG, "Error in getting current page number: " + err.getMessage());
+            })
+        );
+
+        mDisposable.add(mMeetingService.getTotalRemoteVideoPages().getRxObservable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(totalPages -> {
+                    Log.i(TAG, "Total pages: " + totalPages);
+                    if (mPageIndicatorAdapter != null) {
+                        if (totalPages > 0) {
+                            mPageIndicatorAdapter.updateListItem(totalPages + 1);
+                        } else {
+                            mPageIndicatorAdapter.updateListItem(TOTAL_VIEW_PAGER_PAGES);
+                        }
+
+                        if (totalPages == 1) {
+                            mPageIndicatorAdapter.shiftIndicator(totalPages);
+                        }
+                    }
+                }, err -> {
+                    Log.e(TAG, "Error in getting total pages: " + err.getMessage());
+                })
+        );
+
+    }
+
+    private void subscribeForVideoLayout() {
+        mDisposable.add(
+                mMeetingService.getVideoLayout().getRxObservable().observeOn(AndroidSchedulers.mainThread())
+                        .skip(1)
+                        .filter(layout -> layout.getValue() != null)
+                        .subscribe(layout -> {
+                            Log.i(TAG, "Inside video layout sub: " + layout.getValue());
+                            if (mPageIndicatorAdapter != null) {
+                                if (layout.getValue() instanceof MeetingService.VideoLayout.Speaker) {
+                                    mPageIndicatorAdapter.updateListItem(TOTAL_VIEW_PAGER_PAGES);
+                                }
+
+                                mPageIndicatorAdapter.shiftIndicator(mViewPager.getCurrentItem());
+                            }
+                        }, err -> {
+                            Log.e(TAG, "Error while subscribing to video layouts: " + err.getMessage());
+                        })
+        );
     }
 
 

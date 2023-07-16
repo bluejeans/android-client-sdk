@@ -10,8 +10,8 @@ class ScreenSlidePagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            1 -> ContentViewFragment()
-            else -> RemoteViewFragment()
+            1 -> RemoteViewFragment()
+            else -> ContentViewFragment()
         }
     }
 

@@ -28,9 +28,11 @@ import com.bluejeans.bluejeanssdk.meeting.MeetingService;
 import com.bluejeans.bluejeanssdk.meeting.ParticipantsService;
 import com.bluejeans.bluejeanssdk.meeting.chat.PrivateChatService;
 import com.bluejeans.bluejeanssdk.meeting.chat.PublicChatService;
-
+import com.bluejeans.rxextensions.ObservableValue;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Objects;
-
+import java.util.Optional;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import kotlin.Unit;
 
@@ -197,21 +199,25 @@ public class ChatParticipantFragment extends Fragment {
     private void subscribePrivateChatHistory() {
         disposable.add(privateChatService.getChatHistoryByParticipant().subscribeOnUI(
                 map -> {
-                    if (map != null && map.containsKey(remoteParticipant)) {
-                        disposable.add(map.get(remoteParticipant).subscribeOnUI(
-                                msgsList -> {
-                                    if (adapter != null) {
-                                        adapter.updateMessages(msgsList);
-                                        privateChatService.clearUnreadMessagesCountByParticipant(remoteParticipant);
-                                        msgList.smoothScrollToPosition(adapter.getItemCount());
+                    if (map != null) {
+                        Optional<Map.Entry<ParticipantsService.Participant, ObservableValue<ArrayList<ChatMessage>>>> participant =
+                                map.entrySet().stream().filter(p -> p.getKey().getId().equals(remoteParticipant.getId())).findFirst();
+                        if (participant.isPresent()) {
+                            disposable.add(participant.get().getValue().readonly().subscribeOnUI(
+                                    msgsList -> {
+                                        if (adapter != null) {
+                                            adapter.updateMessages(msgsList);
+                                            privateChatService.clearUnreadMessagesCountByParticipant(remoteParticipant);
+                                            msgList.smoothScrollToPosition(adapter.getItemCount());
+                                        }
+                                        return Unit.INSTANCE;
+                                    },
+                                    err -> {
+                                        Log.e(TAG, "Unable to subscribe to private chat history");
+                                        return Unit.INSTANCE;
                                     }
-                                    return Unit.INSTANCE;
-                                },
-                                err -> {
-                                    Log.e(TAG, "Unable to subscribe to private chat history");
-                                    return Unit.INSTANCE;
-                                }
-                        ));
+                            ));
+                        }
                     }
                     return Unit.INSTANCE;
                 },

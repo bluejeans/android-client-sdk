@@ -1,7 +1,11 @@
+/*
+ * Copyright (c) 2023 Blue Jeans Network, Inc. All rights reserved.
+ */
 package com.bluejeans.android.sdksample.ar.augmentedfaces
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
@@ -11,6 +15,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +25,9 @@ import com.bjnclientcore.media.CustomFrameData
 import com.bjnclientcore.media.FrameFormat
 import com.bjnclientcore.media.FrameOrientation
 import com.bjnclientcore.media.VideoSource
+import com.bjnclientcore.ui.util.extensions.gone
+import com.bjnclientcore.ui.util.extensions.visible
+import com.bluejeans.android.sdksample.R
 import com.bluejeans.android.sdksample.SampleApplication
 import com.bluejeans.android.sdksample.ar.common.helpers.ARCoreUtils.getBitmapFromSurface
 import com.bluejeans.android.sdksample.ar.common.helpers.DisplayRotationHelper
@@ -56,7 +65,7 @@ import kotlinx.coroutines.withContext
  * Use the [AugmentedFacesFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class AugmentedFacesFragment(private val activity: Activity) : DialogFragment(), GLSurfaceView.Renderer {
+class AugmentedFacesFragment(private val activity: Activity, private val audioMuted: Boolean, private val videoMuted: Boolean) : DialogFragment(), GLSurfaceView.Renderer {
 
     private var session: Session? = null
     private var displayRotationHelper: DisplayRotationHelper? = null
@@ -69,6 +78,7 @@ class AugmentedFacesFragment(private val activity: Activity) : DialogFragment(),
 
     private val permissionService = SampleApplication.blueJeansSDK.permissionService
     private val customVideoService = SampleApplication.blueJeansSDK.customVideoSourceService
+    private val meetingService = SampleApplication.blueJeansSDK.meetingService
 
     private val backgroundRenderer: BackgroundRenderer = BackgroundRenderer()
     private val augmentedFaceRenderer = AugmentedFaceRenderer()
@@ -84,6 +94,10 @@ class AugmentedFacesFragment(private val activity: Activity) : DialogFragment(),
 
     private var width = 640
     private var height = 480
+
+    private var isAudioMuted = audioMuted
+    private var isVideoMuted = videoMuted
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,6 +122,26 @@ class AugmentedFacesFragment(private val activity: Activity) : DialogFragment(),
         binding.surfaceView.setRenderer(this)
         binding.surfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
         binding.surfaceView.setWillNotDraw(false)
+
+        binding.ivMic.setOnClickListener {
+            isAudioMuted = !isAudioMuted
+            meetingService.setAudioMuted(isAudioMuted)
+            toggleAudioMuteUnMuteView()
+        }
+
+        binding.ivVideo.setOnClickListener {
+            isVideoMuted = !isVideoMuted
+            if (isVideoMuted) {
+                session?.pause()
+            } else {
+                session?.resume()
+            }
+            meetingService.setVideoMuted(isVideoMuted)
+            toggleVideoMuteUnMuteView()
+        }
+
+        toggleAudioMuteUnMuteView()
+        toggleVideoMuteUnMuteView()
     }
 
     override fun onResume() {
@@ -151,6 +185,7 @@ class AugmentedFacesFragment(private val activity: Activity) : DialogFragment(),
 
                     if (message != null) {
                         showToastMessage(message!!)
+                        onDestroy()
                         return
                     }
                 }
@@ -341,6 +376,17 @@ class AugmentedFacesFragment(private val activity: Activity) : DialogFragment(),
         Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
     }
 
+    private fun toggleAudioMuteUnMuteView() {
+        val resID = if (isAudioMuted) R.drawable.ic_mic_off_black_24dp else R.drawable.ic_mic_black_24dp
+        binding.ivMic.setImageResource(resID)
+    }
+
+    private fun toggleVideoMuteUnMuteView() {
+        val resID = if (isVideoMuted) R.drawable.ic_videocam_off_black_24dp
+        else R.drawable.ic_videocam_black_24dp
+        binding.ivVideo.setImageResource(resID)
+    }
+
     companion object {
         private const val TAG = "AugmentedFacesFragment"
 
@@ -352,7 +398,7 @@ class AugmentedFacesFragment(private val activity: Activity) : DialogFragment(),
         private const val MODEL_EAR_FUR = "models/ear_fur.png"
 
         @JvmStatic
-        fun newInstance(activity: Activity) =
-            AugmentedFacesFragment(activity)
+        fun newInstance(activity: Activity, isAudioMuted: Boolean, isVideoMuted: Boolean) =
+            AugmentedFacesFragment(activity, isAudioMuted, isVideoMuted)
     }
 }

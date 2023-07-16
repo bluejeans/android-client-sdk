@@ -17,17 +17,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerPageIndicator"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/transparent"
+        android:layout_height="@dimen/dimen_18"
+        android:background="@drawable/background_indicator_bg"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/dimen_4"
+        android:paddingEnd="@dimen/dimen_4"
+        android:layout_marginBottom="@dimen/_80dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:maxWidth="@dimen/_100dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:paddingBottom="@dimen/_80dp"
-        app:tabBackground="@drawable/tab_selector"
-        app:tabIndicatorHeight="0dp" />
+        app:layout_constraintWidth_max="@dimen/_100dp" />
 
     <TextView
         android:id="@+id/tvInMeetingState"
