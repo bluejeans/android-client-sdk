@@ -180,3 +180,11 @@ See the updated [License.md](LICENSE.md)
 - Target OS level 13
 - Misc bug fixes
 
+
+Version 1.8.0 *(07-2023)*
+---------------------------------
+Features / Changes:
+- Pagination support for participants tiles in People and Gallery layout.
+- Unique identifier support allowing tracking of meeting participants by extracting endpoint information from backend.
+- Misc bug fixes
+
